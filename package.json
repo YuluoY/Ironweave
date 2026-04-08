@@ -1,7 +1,7 @@
 {
   "name": "ironweave",
-  "version": "0.1.0",
-  "description": "Weave industrial-grade engineering skills into your AI coding agent. Flow orchestrator + 16 specialized skills.",
+  "version": "1.0.0",
+  "description": "Agentic skills framework for AI coding agents — orchestrated workflows with adaptive routing, quality gates, and 17 composable skills.",
   "keywords": [
     "agent-skills",
     "ai-coding",
@@ -13,19 +13,36 @@
     "codex",
     "tdd",
     "software-engineering",
-    "orchestrator"
+    "orchestrator",
+    "quality-gates",
+    "skills-sh"
   ],
   "homepage": "https://github.com/YuluoY/ironware",
   "repository": {
     "type": "git",
     "url": "https://github.com/YuluoY/ironware.git"
   },
+  "bugs": {
+    "url": "https://github.com/YuluoY/ironware/issues"
+  },
   "license": "MIT",
-  "author": "Ironweave Contributors",
+  "author": "YuluoY",
   "files": [
     "skills/",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "GEMINI.md",
+    ".cursorrules",
+    ".windsurfrules",
+    ".clinerules",
+    ".github/",
+    ".claude-plugin/",
+    ".cursor-plugin/",
+    ".codex/",
+    ".opencode/",
     "README.md",
     "README_CN.md",
+    "CONTRIBUTING.md",
     "LICENSE"
   ]
 }
