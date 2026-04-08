@@ -101,20 +101,20 @@ User Request
 ### Via skills.sh (Recommended)
 
 ```bash
-# Install all skills (Chinese, default)
+# Install all skills at once (no prompts)
+npx skills add YuluoY/ironware --all
+
+# Interactive: select which skills to install
 npx skills add YuluoY/ironware
 
-# Install English skills
-npx skills add YuluoY/ironware --lang en
-
-# Install specific skills
+# Install specific skills only
 npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 
 # List available skills
 npx skills add YuluoY/ironware --list
 ```
 
-Or via npm:
+Or via npm (supports `--lang en` for English skills):
 
 ```bash
 # Install with Chinese skills (default)

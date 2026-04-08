@@ -99,11 +99,11 @@ Ironweave 是一套完整的软件开发工作流，由一组可自由组合的 
 ### 通过 skills.sh（推荐）
 
 ```bash
-# 安装全部技能（中文，默认）
-npx skills add YuluoY/ironware
+# 一键安装全部技能（无交互提示）
+npx skills add YuluoY/ironware --all
 
-# 安装英文版技能
-npx skills add YuluoY/ironware --lang en
+# 交互式选择要安装的技能
+npx skills add YuluoY/ironware
 
 # 安装指定技能
 npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
@@ -112,7 +112,7 @@ npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 npx skills add YuluoY/ironware --list
 ```
 
-或通过 npm 安装：
+或通过 npm 安装（支持 `--lang en` 切换英文版）：
 
 ```bash
 # 安装中文技能（默认）
