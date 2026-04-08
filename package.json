@@ -1,6 +1,6 @@
 {
   "name": "ironweave",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Agentic skills framework for AI coding agents — orchestrated workflows with adaptive routing, quality gates, and 17 composable skills.",
   "keywords": [
     "agent-skills",
@@ -27,8 +27,12 @@
   },
   "license": "MIT",
   "author": "YuluoY",
+  "bin": {
+    "ironweave": "./bin/cli.js"
+  },
   "files": [
     "skills/",
+    "bin/",
     "CLAUDE.md",
     "AGENTS.md",
     "GEMINI.md",
