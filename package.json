@@ -1,6 +1,6 @@
 {
   "name": "ironweave",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Agentic skills framework for AI coding agents — orchestrated workflows with adaptive routing, quality gates, and 17 composable skills.",
   "keywords": [
     "agent-skills",

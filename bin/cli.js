@@ -51,12 +51,25 @@ if (command === 'init') {
   const skillsOnly = args.includes('--skills-only');
   const force = args.includes('--force');
 
-  // Copy skills/ and hooks/
+  // Directory-based agent roots (skills go inside agent dir for single-agent install)
+  const dirBasedAgents = {
+    cursor: '.cursor',
+    windsurf: '.windsurf',
+    cline: '.clinerules',
+    trae: '.trae',
+    codebuddy: '.codebuddy'
+  };
+  const isSingleDirAgent = agent !== 'all' && dirBasedAgents[agent];
+
+  // Copy skills/
   const skillsSrc = lang === 'en' ? 'skills-en' : 'skills';
   const srcSkills = path.join(pkgDir, skillsSrc);
-  const dstSkills = path.join(targetDir, 'skills');
+  const dstSkills = isSingleDirAgent
+    ? path.join(targetDir, dirBasedAgents[agent], 'skills')
+    : path.join(targetDir, 'skills');
   copyDirRecursive(srcSkills, dstSkills, force);
-  console.log(`✓ skills/ copied (${lang === 'en' ? 'English' : 'Chinese'})`);
+  const skillsLabel = isSingleDirAgent ? `${dirBasedAgents[agent]}/skills/` : 'skills/';
+  console.log(`✓ ${skillsLabel} copied (${lang === 'en' ? 'English' : 'Chinese'})`);
 
   const srcHooks = path.join(pkgDir, 'hooks');
   const dstHooks = path.join(targetDir, 'hooks');
@@ -115,6 +128,18 @@ if (command === 'init') {
           }
         }
       });
+      // Patch skills path references for single dir-based agent
+      if (isSingleDirAgent) {
+        const prefix = dirBasedAgents[agent] + '/';
+        files.forEach(f => {
+          const dstPath = path.join(targetDir, f.dst);
+          if (f.dir) {
+            patchSkillsPathsInDir(dstPath, prefix);
+          } else if (fs.existsSync(dstPath)) {
+            patchSkillsPathsInFile(dstPath, prefix);
+          }
+        });
+      }
       console.log(`✓ ${a} config installed`);
     });
   }
@@ -139,4 +164,19 @@ function copyDirRecursive(src, dst, force) {
       fs.copyFileSync(srcPath, dstPath);
     }
   }
+}
+
+function patchSkillsPathsInDir(dirPath, prefix) {
+  if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) return;
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const full = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) patchSkillsPathsInDir(full, prefix);
+    else patchSkillsPathsInFile(full, prefix);
+  }
+}
+
+function patchSkillsPathsInFile(filePath, prefix) {
+  let content = fs.readFileSync(filePath, 'utf8');
+  const patched = content.replace(/`skills\//g, '`' + prefix + 'skills/');
+  if (patched !== content) fs.writeFileSync(filePath, patched);
 }

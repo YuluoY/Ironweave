@@ -98,33 +98,60 @@ User Request
 
 ## Installation
 
-### Via skills.sh (Recommended)
+### Via npm
 
 ```bash
-# Install all skills at once (no prompts)
+# Install all skills + all agent configs (Chinese, default)
+npx ironweave@latest init
+
+# Install English skills
+npx ironweave@latest init --lang en
+
+# Install for a specific editor only
+npx ironweave@latest init --agent cursor
+npx ironweave@latest init --agent trae
+npx ironweave@latest init --agent windsurf
+
+# Only copy skills, skip agent config files
+npx ironweave@latest init --skills-only
+
+# Overwrite existing files
+npx ironweave@latest init --force
+
+# List all available skills
+npx ironweave@latest list
+```
+
+Available agents: `claude`, `copilot`, `cursor`, `windsurf`, `cline`, `trae`, `codebuddy`, `codex`, `gemini`, `all` (default).
+
+> **Conflict handling**: Existing files are preserved by default. Ironweave adds its config alongside your existing rules. Use `--force` to overwrite.
+
+> **Skills location**: When targeting a single directory-based editor (e.g., `--agent trae`), skills are installed inside the editor directory (e.g., `.trae/skills/`). With `--agent all` (default), skills go to the project root `skills/`.
+
+### Via skills.sh
+
+```bash
+# Install to a specific editor (recommended)
+npx skills add YuluoY/ironware --skill '*' -a cursor -y
+npx skills add YuluoY/ironware --skill '*' -a trae -y
+npx skills add YuluoY/ironware --skill '*' -a claude-code -y
+
+# Install to multiple editors
+npx skills add YuluoY/ironware --skill '*' -a cursor -a windsurf -y
+
+# Install to ALL editors (installs many agent directories)
 npx skills add YuluoY/ironware --all
 
-# Interactive: select which skills to install
+# Interactive: select skills and editors
 npx skills add YuluoY/ironware
-
-# Install specific skills only
-npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 
 # List available skills
 npx skills add YuluoY/ironware --list
 ```
 
-Or via npm (supports `--lang en` for English skills):
+Agent names for skills.sh: `claude-code`, `github-copilot`, `cursor`, `windsurf`, `cline`, `trae`, `codebuddy`, `codex`, `gemini-cli`.
 
-```bash
-# Install with Chinese skills (default)
-npx ironweave init
-
-# Install with English skills
-npx ironweave init --lang en
-```
-
-Supports **9 agents**: Claude Code, GitHub Copilot, Cursor, Windsurf, Cline, Trae, CodeBuddy, Codex, Gemini CLI.
+> Note: `skills.sh` does not support `--lang`. For English skills, use `npx ironweave@latest init --lang en`.
 
 ### Per-Agent Manual Installation
 

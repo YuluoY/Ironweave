@@ -96,33 +96,60 @@ Ironweave 是一套完整的软件开发工作流，由一组可自由组合的 
 
 ## 安装
 
-### 通过 skills.sh（推荐）
+### 通过 npm
 
 ```bash
-# 一键安装全部技能（无交互提示）
+# 安装全部技能 + 全部编辑器配置（中文，默认）
+npx ironweave@latest init
+
+# 安装英文版技能
+npx ironweave@latest init --lang en
+
+# 只安装特定编辑器的配置
+npx ironweave@latest init --agent cursor
+npx ironweave@latest init --agent trae
+npx ironweave@latest init --agent windsurf
+
+# 只复制 skills/，不安装编辑器配置
+npx ironweave@latest init --skills-only
+
+# 覆盖已有文件
+npx ironweave@latest init --force
+
+# 列出所有可用技能
+npx ironweave@latest list
+```
+
+可选编辑器：`claude`、`copilot`、`cursor`、`windsurf`、`cline`、`trae`、`codebuddy`、`codex`、`gemini`、`all`（默认全部）。
+
+> **冲突处理**：默认不覆盖已有文件。Ironweave 会将配置与你现有的规则并存。使用 `--force` 强制覆盖。
+
+> **Skills 位置**：指定单个目录型编辑器时（如 `--agent trae`），skills 会安装到该编辑器目录内（如 `.trae/skills/`）。使用 `--agent all`（默认）时，skills 安装在项目根目录 `skills/`。
+
+### 通过 skills.sh
+
+```bash
+# 安装到指定编辑器（推荐）
+npx skills add YuluoY/ironware --skill '*' -a cursor -y
+npx skills add YuluoY/ironware --skill '*' -a trae -y
+npx skills add YuluoY/ironware --skill '*' -a claude-code -y
+
+# 安装到多个编辑器
+npx skills add YuluoY/ironware --skill '*' -a cursor -a windsurf -y
+
+# 安装到所有编辑器（会生成很多 agent 目录）
 npx skills add YuluoY/ironware --all
 
-# 交互式选择要安装的技能
+# 交互式选择技能和编辑器
 npx skills add YuluoY/ironware
-
-# 安装指定技能
-npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 
 # 列出可用技能
 npx skills add YuluoY/ironware --list
 ```
 
-或通过 npm 安装（支持 `--lang en` 切换英文版）：
+skills.sh 的 Agent 名称：`claude-code`、`github-copilot`、`cursor`、`windsurf`、`cline`、`trae`、`codebuddy`、`codex`、`gemini-cli`。
 
-```bash
-# 安装中文技能（默认）
-npx ironweave init
-
-# 安装英文版技能
-npx ironweave init --lang en
-```
-
-支持 **9 个 Agent**：Claude Code、GitHub Copilot、Cursor、Windsurf、Cline、Trae、CodeBuddy、Codex、Gemini CLI。
+> 注意：`skills.sh` 不支持 `--lang` 参数。如需英文版，请使用 `npx ironweave@latest init --lang en`。
 
 ### 各 Agent 手动安装
 
