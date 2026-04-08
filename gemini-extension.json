@@ -1,0 +1,6 @@
+{
+  "name": "ironweave",
+  "description": "Agentic skills framework for software development: orchestration, requirements, architecture, TDD, and quality gates",
+  "version": "1.0.0",
+  "contextFileName": "GEMINI.md"
+}

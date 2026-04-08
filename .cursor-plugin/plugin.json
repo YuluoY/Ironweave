@@ -15,5 +15,5 @@
     "workflows"
   ],
   "skills": "./skills/",
-  "agents": "./agents/"
+  "hooks": "./hooks/hooks-cursor.json"
 }

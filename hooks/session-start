@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# SessionStart hook for Ironweave plugin
+
+set -euo pipefail
+
+# Determine plugin root directory
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Read orchestrator skill content
+orchestrator_content=$(cat "${PLUGIN_ROOT}/skills/orchestrator/SKILL.md" 2>&1 || echo "Error reading orchestrator skill")
+
+# Escape string for JSON embedding
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+orchestrator_escaped=$(escape_for_json "$orchestrator_content")
+session_context="<IMPORTANT>\nYou have Ironweave skills.\n\nIronweave is a complete software development workflow with built-in quality gates. The orchestrator skill is your main entry point — it auto-senses context, scores difficulty, selects the right route, and runs Plan > Execute > Validate > Deliver.\n\nAll skills are in the skills/ directory, each with a SKILL.md. For any development task, start by reading skills/orchestrator/SKILL.md.\n\nKey skills: orchestrator, requirement-qa, brainstorm, spec-writing, tech-stack, engineering-principles, api-contract-design, code-scaffold, error-handling-strategy, performance-arch-design, observability-design, integration-test-design, implementation-complexity-analysis, task-difficulty, project-context, docs-output, skill-creator.\n</IMPORTANT>"
+
+# Output context injection as JSON.
+# Cursor hooks expect additional_context (snake_case).
+# Claude Code hooks expect hookSpecificOutput.additionalContext (nested).
+# Copilot CLI and others expect additionalContext (top-level, SDK standard).
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
+fi
+
+exit 0

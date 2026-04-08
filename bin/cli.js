@@ -19,6 +19,7 @@ Options:
                     (claude, copilot, cursor, windsurf, cline, codex, gemini, all)
                     Default: all
   --skills-only     Only copy skills/, skip agent config files
+  --force           Overwrite existing files (default: skip existing)
   --help            Show this help message
 `);
   process.exit(0);
@@ -42,12 +43,18 @@ if (command === 'init') {
   const agentFlag = args.indexOf('--agent');
   const agent = agentFlag !== -1 ? args[agentFlag + 1] : 'all';
   const skillsOnly = args.includes('--skills-only');
+  const force = args.includes('--force');
 
-  // Copy skills/
+  // Copy skills/ and hooks/
   const srcSkills = path.join(pkgDir, 'skills');
   const dstSkills = path.join(targetDir, 'skills');
-  copyDirRecursive(srcSkills, dstSkills);
+  copyDirRecursive(srcSkills, dstSkills, force);
   console.log('✓ skills/ copied');
+
+  const srcHooks = path.join(pkgDir, 'hooks');
+  const dstHooks = path.join(targetDir, 'hooks');
+  copyDirRecursive(srcHooks, dstHooks, force);
+  console.log('✓ hooks/ copied');
 
   if (!skillsOnly) {
     const agentFiles = {
@@ -73,7 +80,8 @@ if (command === 'init') {
         { src: '.codex', dst: '.codex', dir: true }
       ],
       gemini: [
-        { src: 'GEMINI.md', dst: 'GEMINI.md' }
+        { src: 'GEMINI.md', dst: 'GEMINI.md' },
+        { src: 'gemini-extension.json', dst: 'gemini-extension.json' }
       ]
     };
 
@@ -89,11 +97,11 @@ if (command === 'init') {
         const srcPath = path.join(pkgDir, f.src);
         const dstPath = path.join(targetDir, f.dst);
         if (f.dir) {
-          copyDirRecursive(srcPath, dstPath);
+          copyDirRecursive(srcPath, dstPath, force);
         } else {
           const dstDir = path.dirname(dstPath);
           if (!fs.existsSync(dstDir)) fs.mkdirSync(dstDir, { recursive: true });
-          if (!fs.existsSync(dstPath)) {
+          if (force || !fs.existsSync(dstPath)) {
             fs.copyFileSync(srcPath, dstPath);
           }
         }
@@ -109,7 +117,7 @@ if (command === 'init') {
 console.error(`Unknown command: ${command}. Run "npx ironweave --help" for usage.`);
 process.exit(1);
 
-function copyDirRecursive(src, dst) {
+function copyDirRecursive(src, dst, force) {
   if (!fs.existsSync(src)) return;
   if (!fs.existsSync(dst)) fs.mkdirSync(dst, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -117,8 +125,8 @@ function copyDirRecursive(src, dst) {
     const srcPath = path.join(src, entry.name);
     const dstPath = path.join(dst, entry.name);
     if (entry.isDirectory()) {
-      copyDirRecursive(srcPath, dstPath);
-    } else if (!fs.existsSync(dstPath)) {
+      copyDirRecursive(srcPath, dstPath, force);
+    } else if (force || !fs.existsSync(dstPath)) {
       fs.copyFileSync(srcPath, dstPath);
     }
   }
