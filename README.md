@@ -124,80 +124,91 @@ npx ironweave init
 npx ironweave init --lang en
 ```
 
-Supports **40+ agents**: Claude Code, GitHub Copilot, Cursor, Codex, Windsurf, Cline, OpenCode, Gemini CLI, Trae, CodeBuddy, and more.
+Supports **9 agents**: Claude Code, GitHub Copilot, Cursor, Windsurf, Cline, Trae, CodeBuddy, Codex, Gemini CLI.
 
 ### Per-Agent Manual Installation
 
 <details>
 <summary><b>Claude Code</b></summary>
 
-```bash
-git clone https://github.com/YuluoY/ironware.git ~/.claude/ironweave
-mkdir -p ~/.claude/skills
-ln -s ~/.claude/ironweave/skills ~/.claude/skills/ironweave
-```
+Ironweave ships with `CLAUDE.md` at the project root — Claude Code reads this automatically.
 
-Or use the Claude plugin system — Ironweave ships with `.claude-plugin/plugin.json`.
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
 <details>
 <summary><b>VS Code GitHub Copilot</b></summary>
 
-Copy the `skills/` directory into your project, then add to `.github/copilot-instructions.md`:
+Ironweave ships with `.github/copilot-instructions.md` pre-configured.
 
-```markdown
-The orchestrator skill (skills/orchestrator/SKILL.md) is the main entry point.
-For any development task, start by reading it.
+```bash
+git clone https://github.com/YuluoY/ironware.git
 ```
-
-Or clone Ironweave directly — it ships with `.github/copilot-instructions.md` pre-configured.
 
 </details>
 
 <details>
 <summary><b>Cursor</b></summary>
 
+Ironweave ships with `.cursor/rules/ironweave.mdc` (`alwaysApply: true`) for auto-discovery.
+
 ```bash
 git clone https://github.com/YuluoY/ironware.git
 ```
 
-Ironweave ships with `.cursorrules` and `.cursor-plugin/plugin.json` for auto-discovery.
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Ironweave ships with `.windsurf/rules/ironweave.md` (`trigger: always_on`) for auto-discovery.
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>Cline</b></summary>
+
+Ironweave ships with `.clinerules/ironweave.md` for auto-discovery.
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>Trae</b></summary>
+
+Ironweave ships with `.trae/rules/ironweave.md` for auto-discovery.
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>CodeBuddy (Tencent Cloud)</b></summary>
+
+Ironweave ships with `.codebuddy/rules/ironweave/RULE.mdc` (`alwaysApply: true`) for auto-discovery.
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
 <details>
 <summary><b>Codex (OpenAI)</b></summary>
 
-```bash
-git clone https://github.com/YuluoY/ironware.git ~/.codex/ironweave
-mkdir -p ~/.agents/skills
-ln -s ~/.codex/ironweave/skills ~/.agents/skills/ironweave
-```
-
-See [.codex/INSTALL.md](./.codex/INSTALL.md) for details.
-
-</details>
-
-<details>
-<summary><b>OpenCode</b></summary>
-
-Add to your `opencode.json`:
-
-```json
-{
-  "plugin": ["ironweave@git+https://github.com/YuluoY/ironware.git"]
-}
-```
-
-See [.opencode/INSTALL.md](./.opencode/INSTALL.md) for details.
-
-</details>
-
-<details>
-<summary><b>Windsurf / Cline / Gemini CLI</b></summary>
-
-Ironweave ships with `.windsurfrules`, `.clinerules`, and `GEMINI.md` respectively. Clone the repo and the agent auto-discovers the rules.
+Ironweave ships with `AGENTS.md` at the project root — Codex reads this automatically.
 
 ```bash
 git clone https://github.com/YuluoY/ironware.git
@@ -206,11 +217,13 @@ git clone https://github.com/YuluoY/ironware.git
 </details>
 
 <details>
-<summary><b>Trae / CodeBuddy / Other Agents</b></summary>
+<summary><b>Gemini CLI</b></summary>
 
-Copy the `skills/` directory into your project. Then add the following to your agent's custom instructions:
+Ironweave ships with `GEMINI.md` at the project root — Gemini CLI reads this automatically.
 
-> The orchestrator skill (`skills/orchestrator/SKILL.md`) is the main entry point. For any development task, start by reading it. All skills are in `skills/`, each with a `SKILL.md` containing instructions.
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
@@ -218,27 +231,25 @@ Copy the `skills/` directory into your project. Then add the following to your a
 
 ```
 ironweave/
-├── skills/                          # Skills (Chinese)
-│   ├── orchestrator/              # Flow orchestrator
-│   │   ├── SKILL.md              # Orchestrator logic
-│   │   └── references/           # Methodology docs
+├── skills/                            # Skills (Chinese)
+│   ├── orchestrator/                # Flow orchestrator
+│   │   ├── SKILL.md                # Orchestrator logic
+│   │   └── references/             # Methodology docs
 │   ├── brainstorm/
 │   ├── spec-writing/
 │   ├── code-scaffold/
-│   ├── ...                        # 16 more skills
+│   ├── ...                          # 16 skills total
 │   └── docs-output/
-├── skills-en/                       # Skills (English)
-├── CLAUDE.md                      # Claude Code instructions
-├── AGENTS.md                      # Codex instructions
-├── GEMINI.md                      # Gemini CLI instructions
-├── .github/copilot-instructions.md  # VS Code Copilot
-├── .cursorrules                   # Cursor rules
-├── .windsurfrules                 # Windsurf rules
-├── .clinerules                    # Cline rules
-├── .claude-plugin/plugin.json     # Claude plugin manifest
-├── .cursor-plugin/plugin.json     # Cursor plugin manifest
-├── .codex/INSTALL.md              # Codex install guide
-├── .opencode/INSTALL.md           # OpenCode install guide
+├── skills-en/                         # Skills (English)
+├── CLAUDE.md                        # Claude Code
+├── AGENTS.md                        # Codex / cross-agent compat
+├── GEMINI.md                        # Gemini CLI
+├── .github/copilot-instructions.md    # VS Code Copilot
+├── .cursor/rules/ironweave.mdc        # Cursor
+├── .windsurf/rules/ironweave.md       # Windsurf
+├── .clinerules/ironweave.md           # Cline
+├── .trae/rules/ironweave.md           # Trae
+├── .codebuddy/rules/ironweave/RULE.mdc  # CodeBuddy
 ├── README.md
 ├── README_CN.md
 ├── CONTRIBUTING.md

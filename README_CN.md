@@ -122,80 +122,91 @@ npx ironweave init
 npx ironweave init --lang en
 ```
 
-支持 **40+ 个 Agent**：Claude Code、GitHub Copilot、Cursor、Codex、Windsurf、Cline、OpenCode、Gemini CLI、Trae、CodeBuddy 等。
+支持 **9 个 Agent**：Claude Code、GitHub Copilot、Cursor、Windsurf、Cline、Trae、CodeBuddy、Codex、Gemini CLI。
 
 ### 各 Agent 手动安装
 
 <details>
 <summary><b>Claude Code</b></summary>
 
-```bash
-git clone https://github.com/YuluoY/ironware.git ~/.claude/ironweave
-mkdir -p ~/.claude/skills
-ln -s ~/.claude/ironweave/skills ~/.claude/skills/ironweave
-```
+Ironweave 自带项目根目录的 `CLAUDE.md` — Claude Code 会自动读取。
 
-也可使用 Claude 插件系统 — Ironweave 自带 `.claude-plugin/plugin.json`。
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
 <details>
 <summary><b>VS Code GitHub Copilot</b></summary>
 
-将 `skills/` 目录复制到你的项目中，然后在 `.github/copilot-instructions.md` 中添加：
+Ironweave 已预配置 `.github/copilot-instructions.md`。
 
-```markdown
-The orchestrator skill (skills/orchestrator/SKILL.md) is the main entry point.
-For any development task, start by reading it.
+```bash
+git clone https://github.com/YuluoY/ironware.git
 ```
-
-或直接克隆 Ironweave — 已预配置 `.github/copilot-instructions.md`。
 
 </details>
 
 <details>
 <summary><b>Cursor</b></summary>
 
+Ironweave 自带 `.cursor/rules/ironweave.mdc`（`alwaysApply: true`），可自动发现。
+
 ```bash
 git clone https://github.com/YuluoY/ironware.git
 ```
 
-Ironweave 自带 `.cursorrules` 和 `.cursor-plugin/plugin.json`，可自动发现。
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Ironweave 自带 `.windsurf/rules/ironweave.md`（`trigger: always_on`），可自动发现。
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>Cline</b></summary>
+
+Ironweave 自带 `.clinerules/ironweave.md`，可自动发现。
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>Trae</b></summary>
+
+Ironweave 自带 `.trae/rules/ironweave.md`，可自动发现。
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
+
+</details>
+
+<details>
+<summary><b>CodeBuddy（腾讯云）</b></summary>
+
+Ironweave 自带 `.codebuddy/rules/ironweave/RULE.mdc`（`alwaysApply: true`），可自动发现。
+
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
 <details>
 <summary><b>Codex (OpenAI)</b></summary>
 
-```bash
-git clone https://github.com/YuluoY/ironware.git ~/.codex/ironweave
-mkdir -p ~/.agents/skills
-ln -s ~/.codex/ironweave/skills ~/.agents/skills/ironweave
-```
-
-详见 [.codex/INSTALL.md](./.codex/INSTALL.md)。
-
-</details>
-
-<details>
-<summary><b>OpenCode</b></summary>
-
-在 `opencode.json` 中添加：
-
-```json
-{
-  "plugin": ["ironweave@git+https://github.com/YuluoY/ironware.git"]
-}
-```
-
-详见 [.opencode/INSTALL.md](./.opencode/INSTALL.md)。
-
-</details>
-
-<details>
-<summary><b>Windsurf / Cline / Gemini CLI</b></summary>
-
-Ironweave 分别自带 `.windsurfrules`、`.clinerules`、`GEMINI.md`。克隆仓库后 Agent 自动发现规则。
+Ironweave 自带项目根目录的 `AGENTS.md` — Codex 会自动读取。
 
 ```bash
 git clone https://github.com/YuluoY/ironware.git
@@ -204,11 +215,13 @@ git clone https://github.com/YuluoY/ironware.git
 </details>
 
 <details>
-<summary><b>Trae / CodeBuddy / 其他 Agent</b></summary>
+<summary><b>Gemini CLI</b></summary>
 
-将 `skills/` 目录复制到你的项目中，然后在 Agent 的自定义指令中添加：
+Ironweave 自带项目根目录的 `GEMINI.md` — Gemini CLI 会自动读取。
 
-> The orchestrator skill (`skills/orchestrator/SKILL.md`) is the main entry point. For any development task, start by reading it. All skills are in `skills/`, each with a `SKILL.md` containing instructions.
+```bash
+git clone https://github.com/YuluoY/ironware.git
+```
 
 </details>
 
@@ -216,27 +229,25 @@ git clone https://github.com/YuluoY/ironware.git
 
 ```
 ironweave/
-├── skills/                          # 技能（中文）
-│   ├── orchestrator/              # 流程编排器
-│   │   ├── SKILL.md              # 编排器逻辑
-│   │   └── references/           # 方法论文档
+├── skills/                            # 技能（中文）
+│   ├── orchestrator/                # 流程编排器
+│   │   ├── SKILL.md                # 编排器逻辑
+│   │   └── references/             # 方法论文档
 │   ├── brainstorm/
 │   ├── spec-writing/
 │   ├── code-scaffold/
-│   ├── ...                        # 另外 16 个技能
+│   ├── ...                          # 共 16 个技能
 │   └── docs-output/
-├── skills-en/                       # 技能（英文）
-├── CLAUDE.md                      # Claude Code 指令
-├── AGENTS.md                      # Codex 指令
-├── GEMINI.md                      # Gemini CLI 指令
-├── .github/copilot-instructions.md  # VS Code Copilot
-├── .cursorrules                   # Cursor 规则
-├── .windsurfrules                 # Windsurf 规则
-├── .clinerules                    # Cline 规则
-├── .claude-plugin/plugin.json     # Claude 插件清单
-├── .cursor-plugin/plugin.json     # Cursor 插件清单
-├── .codex/INSTALL.md              # Codex 安装指南
-├── .opencode/INSTALL.md           # OpenCode 安装指南
+├── skills-en/                         # 技能（英文）
+├── CLAUDE.md                        # Claude Code
+├── AGENTS.md                        # Codex / 跨 Agent 兼容
+├── GEMINI.md                        # Gemini CLI
+├── .github/copilot-instructions.md    # VS Code Copilot
+├── .cursor/rules/ironweave.mdc        # Cursor
+├── .windsurf/rules/ironweave.md       # Windsurf
+├── .clinerules/ironweave.md           # Cline
+├── .trae/rules/ironweave.md           # Trae
+├── .codebuddy/rules/ironweave/RULE.mdc  # CodeBuddy
 ├── README.md
 ├── README_CN.md
 ├── CONTRIBUTING.md
