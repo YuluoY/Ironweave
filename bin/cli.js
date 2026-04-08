@@ -18,6 +18,7 @@ Options:
   --agent <name>    Only install config for specific agent
                     (claude, copilot, cursor, windsurf, cline, codex, gemini, all)
                     Default: all
+  --lang <lang>     Language for skills: zh (Chinese, default) or en (English)
   --skills-only     Only copy skills/, skip agent config files
   --force           Overwrite existing files (default: skip existing)
   --help            Show this help message
@@ -26,11 +27,14 @@ Options:
 }
 
 if (command === 'list') {
-  const skillsDir = path.join(__dirname, '..', 'skills');
+  const langIdx = args.indexOf('--lang');
+  const listLang = langIdx !== -1 ? args[langIdx + 1] : 'zh';
+  const skillsSrc = listLang === 'en' ? 'skills-en' : 'skills';
+  const skillsDir = path.join(__dirname, '..', skillsSrc);
   const skills = fs.readdirSync(skillsDir).filter(f => {
     return fs.statSync(path.join(skillsDir, f)).isDirectory();
   });
-  console.log(`\nIronweave Skills (${skills.length}):\n`);
+  console.log(`\nIronweave Skills [${listLang}] (${skills.length}):\n`);
   skills.forEach(s => console.log(`  - ${s}`));
   console.log('');
   process.exit(0);
@@ -42,14 +46,17 @@ if (command === 'init') {
 
   const agentFlag = args.indexOf('--agent');
   const agent = agentFlag !== -1 ? args[agentFlag + 1] : 'all';
+  const langFlag = args.indexOf('--lang');
+  const lang = langFlag !== -1 ? args[langFlag + 1] : 'zh';
   const skillsOnly = args.includes('--skills-only');
   const force = args.includes('--force');
 
   // Copy skills/ and hooks/
-  const srcSkills = path.join(pkgDir, 'skills');
+  const skillsSrc = lang === 'en' ? 'skills-en' : 'skills';
+  const srcSkills = path.join(pkgDir, skillsSrc);
   const dstSkills = path.join(targetDir, 'skills');
   copyDirRecursive(srcSkills, dstSkills, force);
-  console.log('✓ skills/ copied');
+  console.log(`✓ skills/ copied (${lang === 'en' ? 'English' : 'Chinese'})`);
 
   const srcHooks = path.join(pkgDir, 'hooks');
   const dstHooks = path.join(targetDir, 'hooks');

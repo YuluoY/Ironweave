@@ -15,7 +15,7 @@ For any development task, start by reading the orchestrator skill. It will guide
 
 All skills are in `skills/`. Each has a `SKILL.md` with YAML frontmatter (`name`, `description`).
 
-Key skills: `orchestrator`, `requirement-qa`, `brainstorm`, `spec-writing`, `tech-stack`, `engineering-principles`, `api-contract-design`, `code-scaffold`, `error-handling-strategy`, `performance-arch-design`, `observability-design`, `integration-test-design`, `implementation-complexity-analysis`, `task-difficulty`, `project-context`, `docs-output`, `skill-creator`.
+Key skills: `orchestrator`, `requirement-qa`, `brainstorm`, `spec-writing`, `tech-stack`, `engineering-principles`, `api-contract-design`, `code-scaffold`, `error-handling-strategy`, `performance-arch-design`, `observability-design`, `integration-test-design`, `implementation-complexity-analysis`, `task-difficulty`, `project-context`, `docs-output`.
 
 ## Contributing
 

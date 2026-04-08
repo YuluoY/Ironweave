@@ -95,21 +95,33 @@ User Request
 - `task-difficulty` — Multi-dimensional difficulty scoring (1-10)
 - `project-context` — Project structure awareness & cross-session persistence
 - `docs-output` — Document output management (modular docs/ organization)
-- `skill-creator` — Create, modify, and evaluate agent skills
 
 ## Installation
 
 ### Via skills.sh (Recommended)
 
 ```bash
-# Install all skills
+# Install all skills (Chinese, default)
 npx skills add YuluoY/ironware
+
+# Install English skills
+npx skills add YuluoY/ironware --lang en
 
 # Install specific skills
 npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 
 # List available skills
 npx skills add YuluoY/ironware --list
+```
+
+Or via npm:
+
+```bash
+# Install with Chinese skills (default)
+npx ironweave init
+
+# Install with English skills
+npx ironweave init --lang en
 ```
 
 Supports **40+ agents**: Claude Code, GitHub Copilot, Cursor, Codex, Windsurf, Cline, OpenCode, Gemini CLI, Trae, CodeBuddy, and more.
@@ -206,7 +218,7 @@ Copy the `skills/` directory into your project. Then add the following to your a
 
 ```
 ironweave/
-├── skills/
+├── skills/                          # Skills (Chinese)
 │   ├── orchestrator/              # Flow orchestrator
 │   │   ├── SKILL.md              # Orchestrator logic
 │   │   └── references/           # Methodology docs
@@ -214,7 +226,8 @@ ironweave/
 │   ├── spec-writing/
 │   ├── code-scaffold/
 │   ├── ...                        # 16 more skills
-│   └── skill-creator/
+│   └── docs-output/
+├── skills-en/                       # Skills (English)
 ├── CLAUDE.md                      # Claude Code instructions
 ├── AGENTS.md                      # Codex instructions
 ├── GEMINI.md                      # Gemini CLI instructions
@@ -243,7 +256,7 @@ ironweave/
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Skills live directly in this repository. Follow `skills/skill-creator` for creating and testing new skills.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Skills live directly in this repository.
 
 ## License
 

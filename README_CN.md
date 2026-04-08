@@ -93,21 +93,33 @@ Ironweave 是一套完整的软件开发工作流，由一组可自由组合的 
 - `task-difficulty` — 多维度难度评分（1-10）
 - `project-context` — 项目结构感知与跨会话持久化
 - `docs-output` — 文档产出管理（模块化 docs/ 组织）
-- `skill-creator` — 创建、修改、评测 Agent Skills
 
 ## 安装
 
 ### 通过 skills.sh（推荐）
 
 ```bash
-# 安装全部技能
+# 安装全部技能（中文，默认）
 npx skills add YuluoY/ironware
+
+# 安装英文版技能
+npx skills add YuluoY/ironware --lang en
 
 # 安装指定技能
 npx skills add YuluoY/ironware --skill orchestrator --skill brainstorm
 
 # 列出可用技能
 npx skills add YuluoY/ironware --list
+```
+
+或通过 npm 安装：
+
+```bash
+# 安装中文技能（默认）
+npx ironweave init
+
+# 安装英文版技能
+npx ironweave init --lang en
 ```
 
 支持 **40+ 个 Agent**：Claude Code、GitHub Copilot、Cursor、Codex、Windsurf、Cline、OpenCode、Gemini CLI、Trae、CodeBuddy 等。
@@ -204,7 +216,7 @@ git clone https://github.com/YuluoY/ironware.git
 
 ```
 ironweave/
-├── skills/
+├── skills/                          # 技能（中文）
 │   ├── orchestrator/              # 流程编排器
 │   │   ├── SKILL.md              # 编排器逻辑
 │   │   └── references/           # 方法论文档
@@ -212,7 +224,8 @@ ironweave/
 │   ├── spec-writing/
 │   ├── code-scaffold/
 │   ├── ...                        # 另外 16 个技能
-│   └── skill-creator/
+│   └── docs-output/
+├── skills-en/                       # 技能（英文）
 ├── CLAUDE.md                      # Claude Code 指令
 ├── AGENTS.md                      # Codex 指令
 ├── GEMINI.md                      # Gemini CLI 指令
@@ -241,7 +254,7 @@ ironweave/
 
 ## 贡献
 
-请参阅 [CONTRIBUTING.md](./CONTRIBUTING.md)。技能直接存放在本仓库中。创建和测试新技能请参考 `skills/skill-creator`。
+请参阅 [CONTRIBUTING.md](./CONTRIBUTING.md)。技能直接存放在本仓库中。
 
 ## 许可证
 
