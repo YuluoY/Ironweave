@@ -1,0 +1,31 @@
+{
+  "name": "ironweave",
+  "version": "0.1.0",
+  "description": "Weave industrial-grade engineering skills into your AI coding agent. Flow orchestrator + 16 specialized skills.",
+  "keywords": [
+    "agent-skills",
+    "ai-coding",
+    "flow-orchestrator",
+    "skills",
+    "claude-code",
+    "copilot",
+    "cursor",
+    "codex",
+    "tdd",
+    "software-engineering",
+    "orchestrator"
+  ],
+  "homepage": "https://github.com/YuluoY/ironware",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YuluoY/ironware.git"
+  },
+  "license": "MIT",
+  "author": "Ironweave Contributors",
+  "files": [
+    "skills/",
+    "README.md",
+    "README_CN.md",
+    "LICENSE"
+  ]
+}

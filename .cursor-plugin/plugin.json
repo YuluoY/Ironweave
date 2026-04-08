@@ -1,0 +1,19 @@
+{
+  "name": "ironweave",
+  "displayName": "Ironweave",
+  "description": "Agentic skills framework for software development: orchestration, requirements, architecture, TDD, and quality gates",
+  "version": "1.0.0",
+  "homepage": "https://github.com/YuluoY/ironware",
+  "repository": "https://github.com/YuluoY/ironware",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "orchestrator",
+    "tdd",
+    "architecture",
+    "quality-gates",
+    "workflows"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

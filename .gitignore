@@ -1,0 +1,23 @@
+# Private / non-open-source files
+steps/
+AI-Coding.md
+Tasks.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+dist/
+*.log
+
+# Cache
+.cache/
+*.db
