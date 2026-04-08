@@ -1,287 +1,241 @@
 ---
 name: requirement-qa
 description: >-
-  Guide users to progressively clarify requirements or technical decisions through multi-round QA dialog. Uses a "diverge then converge" pattern: first ask open questions to expand requirement boundaries, then ask focused follow-ups to converge on actionable conclusions. Outputs structured requirement summaries or technical decision summaries.
-  Use this skill when: the user's requirement description is vague or incomplete (e.g. "I want to build an XX system"), the user is unsure about technical approach selection, the user requests requirement analysis, requirement research, requirement interviews, requirement review, requirement communication, technical proposal discussion, architecture discussion, or says "help me think about what's missing", "help me sort out requirements", "let's discuss this project". When input is insufficient to produce a complete document, enter this skill's QA flow first rather than delivering half-baked guesswork.
+  Guides users from vague ideas to complete requirements through a "Set Direction → Incremental Output → User Review → Confirm/Correct" loop. Unlike pure Q&A mode, this skill produces reviewable document fragments to docs/01-requirement/ each round — users only need to judge "is this right?" rather than articulate requirements from scratch.
+  Use this skill when: user's requirements are vague or incomplete (e.g., "I want to build a XX system"), user is unsure about technical choices, user requests requirement analysis/review/interview/brainstorming/architecture discussion, or says "help me think about what's missing", "help me sort out the requirements", "let's talk about this project". When input is insufficient for a complete document, enter this skill's QA flow rather than delivering guesswork.
 ---
 
-# Requirement QA Dialog
+# Requirement QA
 
-This Skill helps users move from fuzzy ideas to clear, complete, actionable requirement descriptions or technical decisions through structured multi-round dialog. The core problem it solves: users have requirements in their heads, but what they express is often just the tip of the iceberg — this skill's goal is to surface what's beneath.
+This skill guides users from vague ideas to clear, complete, actionable requirements through **incremental output + user review** loops.
 
-## Core Methodology: Diverge then Converge
+**Core principle**: Users don't need to "articulate requirements clearly" — they just need to judge "is what the Agent produced correct?" This shifts the information quality burden from user to Agent, changing the user's role from "answerer" to "reviewer."
 
-Each topic goes through two phases:
+## Output Target
 
-1. **Diverge Phase**: Open-ended questions to explore possibility boundaries
-   - "What other user roles will use this feature?"
-   - "What happens if we don't impose this restriction?"
-   - "Are there similar products we can reference?"
+Each QA loop directly creates or updates modular files under `docs/01-requirement/`:
 
-2. **Converge Phase**: Directed follow-ups to lock in specific decisions
-   - "Among these three options, which do you prefer? Why?"
-   - "Is this feature P0 or can it be deferred?"
-   - "I understand you mean X — is that correct?"
+```
+docs/01-requirement/
+├── project-profile.md      ← Project profile (positioning, users, goals)
+├── feature-scope.md        ← Feature scope (feature list + MoSCoW priorities)
+├── business-rules.md       ← Business rules (core rules + edge cases)
+├── non-functional.md       ← Non-functional requirements (performance, security, compliance)
+└── tech-constraints.md     ← Technical constraints (tech stack, deployment, integrations)
+```
 
-## Interaction Style: Prefer Structured Options
+These files serve as input for subsequent skills like `spec-writing`. requirement-qa addresses **What** (what to build), spec-writing addresses **How** (how to achieve it).
 
-Prefer using the structured questioning capabilities provided by the current Agent's host editor, rather than system-level dialogs. Fall back to plain chat messages only if the host completely lacks structured questioning support. The clarification logic is the same across hosts — only the UI presentation differs; no logic branching is allowed.
+## Core Loop: Output → Review → Correct
+
+Every module follows the same three-step loop:
+
+### Step 1: User Sets Direction
+
+User provides high-level direction or existing information — can be very brief:
+- "I want to build an online education platform"
+- "An internal project management tool for the team"
+- Or even just "help me think about what this system is missing"
+
+The Agent infers as many details as possible based on available information (user input + repository engineering facts).
+
+### Step 2: Agent Outputs + Recommends Options
+
+The Agent does two things:
+
+1. **Directly produces document fragments**: Writes inferrable content as structured documents, creates or updates the corresponding file in `docs/01-requirement/`
+2. **Provides recommended options for uncertain points**: Following option rules (2-5 options, one marked as recommended, last one is free input)
+
+Key: **Output first, then ask**. Don't come empty-handed asking "what do you want to build?" — first write a draft based on known information, then ask about uncertain points in the draft.
+
+### Step 3: User Review + Confirmation
+
+What the user sees is a **reviewable document**, not a pile of questions. Users can:
+- Confirm: "Yes, that's right" → Agent moves to next module
+- Mark corrections: "The role description is wrong, it should be XX" → Agent updates the file
+- Add information: "There's a scenario you missed" → Agent adds to the file
+
+After confirming user review results, the Agent **updates the file in place** (no delete-and-recreate), then moves to the next module or deeper follow-ups.
+
+## Interaction: Prefer Structured Options
+
+Prefer the structured questioning capability provided by the current Agent host editor, not system-level popups. Only fall back to plain chat messages if the host completely lacks structured questioning support. There is only one clarification logic — different hosts only differ in UI presentation, no logic forking allowed.
 
 Core rules:
-- Each question has **2-5 options**, **must mark exactly one recommended option** (with reasoning), **last option is always free-form input**
-- Recommendation basis: Engineering facts > contextual inference > industry conventions > safety-side preference
+- Each question has **2-5 options**, **must mark exactly one as recommended** (with rationale), **last option is always free input**
+- Recommendation basis: Engineering facts > Context inference > Industry conventions > Safety-side preference
 
-For detailed option design rules, recommended option marking rules, and host adaptation methods, see [references/option-rules.md](references/option-rules.md).
+For detailed option design rules, recommendation marking rules, and host adaptation, see [references/option-rules.md](references/option-rules.md).
 
-At the end of each dialog round, do a **brief summary confirmation** to ensure mutual understanding before moving to the next topic.
+## Question Pacing
 
-## Questioning Rhythm Control
+### Output First, Then Ask
 
-### Generate Questions On Demand
+The core output of each round is a **document fragment** — questions only clarify uncertain points in the document. Instead of "ask 5 questions and wait for answers", the better approach is:
+- Write a draft (80% inferred + 20% to be confirmed)
+- Mark uncertain points in the draft with `<!-- to be confirmed -->` or **bold annotations**
+- Ask about the 1-3 most critical uncertain points
 
-How many questions per round depends on the actual unknowns to clarify:
+### Generate Questions as Needed
 
-- Only one key unknown? Ask just one question
-- Multiple **independent** unknowns can be asked together in one round to reduce back-and-forth
+How many questions per round depends on actual unknowns that need clarification:
+
+- Only one key unknown → ask only one question
+- Multiple **independent** unknowns can be asked together in one round to reduce round-trips
 - Multiple **dependent** unknowns must be split across rounds — later questions depend on earlier answers
 
-**Bad example**: Forcing dependent questions into one round — "Are you building Web or desktop? Which browsers to support?" (browser question depends on the "Web" premise)
+**Anti-pattern**: Forcing dependent questions into one round — "Are you building for web or desktop? Which browsers to support?" (browsers depend on "web" as a prerequisite)
 
-**Correct approach**: First ask "What is the final product form?", then ask specific constraints based on the answer.
+**Correct approach**: First ask "what's the final product form", then ask specific constraints based on the answer.
 
 ### High-Value Questions First
 
-Prioritize questions that can change the execution path:
+Prioritize questions that change the execution path:
 
 - **Ask first**: What to build, for whom, to what extent, scope boundaries
-- **Ask later**: What technology, what style, what UI preferences
+- **Ask later**: Which technology, what style, what UI preferences
 
 ### Start from Engineering Facts
 
-If the current repo is already a Vue 3 project, don't ask "Do you want React or Vue?" — read facts first, then ask about genuinely unknown things.
+If the current repository is already a Vue 3 project, don't ask "Do you want React or Vue?" — read facts first, write them directly into tech-constraints.md, then ask about genuinely unknown things.
 
-## State Tracking
+## Module Progression
 
-After each Q&A round, maintain two internal states:
+### Module 1: Project Profile (project-profile.md)
 
-- **Current understanding**: What has been stably established based on this round's Q&A
-- **Draft output**: What deliverable draft could be produced if we had to output right now
+**Output content**: Project positioning, target user roles and core needs, core pain points, success criteria, time constraints.
 
-These states ensure subsequent rounds focus on "what's still missing" rather than re-understanding from scratch each round. They can be shown to the user during summaries so they can see requirements taking shape.
+**Agent's approach**:
+1. Read user input + scan repository (README, package.json, existing docs, etc.)
+2. Based on known information, **directly write** a `project-profile.md` draft
+3. Ask about uncertain points (e.g., target user roles, success criteria)
+4. User reviews → update file → confirm and move to next module
 
-## Dialog Flow
-
-### Round 1: Project Profile (Required)
-
-Goal: Establish the full project picture within 5-8 questions.
-
-**Requirement-oriented core questions:**
-- Who is this product/feature for? (target user roles)
-- What problem does it solve? (core pain points)
-- How do users currently solve this problem? (status quo and alternatives)
-- What does success look like? (quantifiable business goals)
-- Project timeline constraints? (MVP deadline, milestones)
-
-**Technology-oriented core questions:**
-- Current team tech stack? (existing projects, team expertise)
-- Any predetermined technical constraints? (e.g., must deploy on-premise, must support IE)
-- Expected user scale? (impacts architecture and performance design)
-- Deployment environment? (cloud / private / hybrid)
-- Budget and staffing limitations?
-
-> **Questioning principle**: Ask at most 3 questions per round. Too many causes fatigue, degrading information quality. Adjust rhythm based on answer detail level — detailed answers mean fewer questions needed; brief answers mean more follow-up.
-
-### Round 2: Feature Boundary Exploration (Diverge-heavy)
-
-Goal: Enumerate feature points, user scenarios, boundary conditions.
-
-**Questioning strategies:**
-- **Role dimension**: Beyond primary users, are there admins, auditors, third-party systems?
-- **Scenario dimension**: Beyond normal flow, how to handle exceptions? Batch operations? Concurrent scenarios?
-- **Data dimension**: What data inputs/outputs? Data volume? Data lifecycle?
-- **Integration dimension**: Which external systems to connect with? Auth methods? Data formats?
-- **Non-functional dimension**: Performance requirements? Security/compliance requirements? Availability requirements?
-
-**Anti-patterns to avoid:**
-- Don't start discussing implementation details in this round
-- Don't steer users away from features just because they're "hard to implement" — record first, discuss priority later
-- Don't dump all questions at once — dynamically select next questions based on previous answers
-
-### Round 3: Priority and Scope Convergence
-
-Goal: From the diverged feature list, determine MVP scope.
-
-**Convergence strategies:**
-- Classify by **MoSCoW** (Must / Should / Could / Won't)
-- For each Must feature, follow up with acceptance criteria: "What level of completion counts as OK?"
-- For Won't features, confirm: "Definitely not this phase? Possibly later?"
-- Mark dependencies: "Feature A depends on Feature B, so B must also be Must"
-
-### Round 4: Technical Constraint Convergence (if tech decisions involved)
-
-Goal: Determine key technical decision points.
-
-**Convergence strategies:**
-- Aggregate collected constraints into comparison tables
-- For each decision point, present 2-3 options + pros/cons analysis
-- Let user choose, record the reasoning
-- Mark "to-be-validated" technical risks
-
-### Round 5: Completeness Check and Output
-
-Goal: Confirm nothing is missed, output structured summary.
-
-**Checklist:**
-- [ ] All user roles identified
-- [ ] Core business flows clarified
-- [ ] Exception and boundary scenarios discussed
-- [ ] Priorities ranked (MoSCoW)
-- [ ] Acceptance criteria defined (at least for Must items)
-- [ ] Technical constraints documented (if any)
-- [ ] "Not doing this phase" boundaries explicit
-- [ ] Integration points with external systems identified
-
-## Dialog Techniques
-
-### Handling Different User Types
-
-- **Verbose users**: Interrupt with timely summaries — "Let me confirm I understood correctly..."; help focus on pending questions
-- **Terse users**: Provide specific options instead of open-ended questions — "Do you need A or B?"; use yes/no questions for confirmation
-- **Indecisive users**: Give recommended approaches + reasoning — "Based on your scenario, I suggest doing X first because..."
-- **Over-divergent users**: Gently redirect — "Great idea, I'll note it down. Let's finish confirming the core flow first?"
-
-### Summary Template
-
-After completing discussion of each topic, do a concise structured confirmation:
-
-```
-[Summary Confirmation]
-Topic: User Login
-Confirmed:
-- Support phone number+SMS code and email+password methods
-- No third-party login for now (WeChat, GitHub)
-- Lock account for 30 minutes after 5 failed attempts
-Pending:
-- SMS code validity period (suggest 5 minutes, TBC)
-- Whether "remember me" feature is needed
-```
-
-## Output Format
-
-After dialog completion, output a **structured requirement summary** or **technical decision summary**.
-
-### Requirement Summary Template
+**Output template**:
 
 ```markdown
-# Requirement Summary: [Project/Feature Name]
+# Project Profile: {Project Name}
 
-## Project Positioning
-[One or two sentence description]
+## Positioning
+{One or two sentences describing what problem this product solves}
 
 ## Target Users
-| Role | Core Need |
-|------|----------|
-| ... | ... |
-
-## Feature Scope (MoSCoW)
-### Must (MVP Essentials)
-- [ ] Feature + brief acceptance criteria
-### Should (Important but Deferrable)
-- [ ] ...
-### Could (Nice-to-have)
-- [ ] ...
-### Won't (Explicitly Out of Scope)
-- [ ] ...
-
-## Key Business Rules
-- Rule 1
-- Rule 2
-
-## Non-Functional Requirements
-- Performance: ...
-- Security: ...
-
-## Pending Items
-- [ ] ...
-
-## Technical Constraints (if any)
-- ...
-```
-
-### Technical Decision Summary Template
-
-```markdown
-# Technical Decision Summary: [Project Name]
-
-## Project Constraints
-- Team size: ...
-- Timeline: ...
-- Deployment environment: ...
-
-## Confirmed Decisions
-| Decision Point | Choice | Reasoning |
-|--------|------|------|
+| Role | Core Need | Usage Frequency |
+|------|-----------|-----------------|
 | ... | ... | ... |
 
-## Risks to Validate
-- [ ] ...
+## Core Pain Points
+- How users currently solve this problem
+- Main dissatisfaction with existing solutions
 
-## Version Constraints
-- Node.js: ...
-- pnpm: ...
+## Success Criteria
+- {Quantifiable business objectives}
+
+## Time Constraints
+- MVP deadline:
+- Key milestones:
 ```
 
-## Execution Method
+### Module 2: Feature Scope (feature-scope.md)
 
-1. **Check entry conditions**: Enter QA flow when user input is insufficient to produce a complete document
-2. **Progress by rounds**: No need to strictly follow five rounds — adjust flexibly based on actual needs; end early when enough info is gathered
-3. **Summarize each round**: Ensure mutual understanding before continuing
-4. **Exit when ready**: When most checklist items are checked or user says "that's about it", output structured summary
-5. **Output summary**: After summary output, prompt user that they can use it to generate formal documents
+**Output content**: Feature list (categorized by MoSCoW), each with brief acceptance criteria.
+
+**Agent's approach**:
+1. Based on project profile, **proactively infer** likely feature list
+2. Write `feature-scope.md` draft, categorized by MoSCoW
+3. Ask: "Is this feature list complete? Are priorities correct?"
+4. User reviews → add/remove/modify → update file
+
+**Output template**:
+
+```markdown
+# Feature Scope: {Project Name}
+
+## Must (MVP Essential)
+- [ ] {Feature} — Acceptance criteria: {brief description}
+- [ ] ...
+
+## Should (Important but Deferrable)
+- [ ] ...
+
+## Could (Nice to Have)
+- [ ] ...
+
+## Won't (Explicitly Excluded)
+- [ ] ...
+
+## Feature Dependencies
+- {Feature A} depends on {Feature B}
+```
+
+### Module 3: Business Rules (business-rules.md)
+
+**Output content**: Core business rules, edge cases, exception handling strategies.
+
+**Agent's approach**:
+1. Extract implicit business rules from feature scope
+2. **Proactively infer** common edge cases and exception scenarios
+3. Write `business-rules.md`, annotating which items are inferred
+4. User reviews → correct/supplement → update file
+
+### Module 4: Non-Functional Requirements (non-functional.md)
+
+**Output content**: Performance, security, availability, compliance requirements.
+
+**Agent's approach**:
+1. Based on project type and user scale, **proactively infer** reasonable non-functional metrics
+2. Write `non-functional.md` with recommended values
+3. Ask: Focus on confirming performance metrics and security/compliance requirements
+4. User reviews → update file
+
+### Module 5: Technical Constraints (tech-constraints.md) (if applicable)
+
+**Output content**: Tech stack, deployment environment, integration points, team constraints.
+
+**Agent's approach**:
+1. Scan repository for existing tech stack information
+2. **Directly write** confirmed facts (don't ask about things already visible in code)
+3. For decision points, provide comparison tables + recommendations
+4. User reviews → update file
+
+## Conversation Techniques
+
+### Adapting to Different User Types
+
+- **Talkative users**: Promptly update documents so users see information being structured; avoid information scattering in chat
+- **Quiet users**: More output, fewer questions; write more complete drafts so users only need to confirm "right/wrong"
+- **Indecisive users**: Provide recommended solution + rationale: "Based on your scenario, I suggest doing X first because..."
+- **Divergent users**: Record ideas to the Could/Won't section of documents, gently guide back to core flow
+
+### Review Confirmation Template
+
+After completing a module's document update:
+
+```
+Updated docs/01-requirement/project-profile.md
+
+Points to confirm:
+1. Are the target users limited to "students" and "teachers"?
+2. Is "1000 DAU" a reasonable success criterion?
+
+Please review the file content and let me know what needs correction. After confirmation, I'll move to the next module (feature scope).
+```
+
+## Execution
+
+1. **Entry condition**: When user input is insufficient for a complete document, enter QA flow
+2. **Start with project profile**: Regardless of information volume, first produce a project-profile.md draft
+3. **Progress by module**: Each module goes through "output → review → correct" loop; skip modules if information is sufficient
+4. **Update in place**: Each correction updates the same file, no new files created
+5. **Exit when ready**: When all Must modules are reviewed and user is satisfied, output completion summary
+6. **Handoff**: Prompt user that `docs/01-requirement/` output can feed into spec-writing for detailed requirement documents
 
 ## Completion Signals
 
-By default, QA ends and summary is output only when:
-- User explicitly says "start producing", "you can write the doc now", "go ahead with this", etc.
-- All Must items in the checklist are confirmed
+QA can only end in these situations by default:
+- User explicitly says "start output", "ready to write docs", "go with this", etc.
+- project-profile.md and feature-scope.md have at least completed review
 
-If user says "keep asking" or "don't start yet", treat as continuing clarification. Even if user demands immediate end but info is incomplete, **explicitly list assumptions** in the output summary.
+If user says "keep asking" or "don't start yet", treat as continue clarification. Even if user insists on ending immediately but information is incomplete, **explicitly list assumptions** in documents, annotated as "Not confirmed by user, based on inference."
 
 For the complete signal list and minimum exit criteria, see [references/completion-signals.md](references/completion-signals.md).
-
-## Document Persistence
-
-Each Q&A round should be persisted to a Markdown file, not relying on model memory. Use `scripts/qa_session.py` to manage session documents:
-
-```bash
-# Start new session
-python3 skills/requirement-qa/scripts/qa_session.py start \
-  --topic "User Login Feature" \
-  --initial-request "I need a login feature"
-
-# Record each round
-python3 skills/requirement-qa/scripts/qa_session.py append-turn \
-  --doc-path "<doc_path>" \
-  --question "Which login methods to support?" \
-  --answer "Phone+SMS code, email+password" \
-  --confirmed "Support phone+SMS code" \
-  --confirmed "Support email+password" \
-  --open-item "Whether third-party login is needed" \
-  --current-understanding "Core login methods confirmed"
-
-# Finalize session
-python3 skills/requirement-qa/scripts/qa_session.py finalize \
-  --doc-path "<doc_path>" \
-  --final-summary "Login feature requirements converged" \
-  --deliverable "Requirement summary document"
-```
-
-Documents are stored in the `docs/qa/` directory, one file per session.
-
-## Resources
-
-| Path | Description |
-|------|------|
-| `references/option-rules.md` | Option design rules, recommended option marking rules, host adaptation |
-| `references/completion-signals.md` | Completion signal list, continue-intent protection, minimum exit criteria |
-| `scripts/qa_session.py` | QA session document creation, appending, and finalization |
