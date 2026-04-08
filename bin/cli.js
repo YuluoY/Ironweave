@@ -16,7 +16,7 @@ Usage:
 
 Options:
   --agent <name>    Only install config for specific agent
-                    (claude, copilot, cursor, windsurf, cline, trae, codex, gemini, all)
+                    (claude, copilot, cursor, windsurf, cline, trae, codebuddy, codex, gemini, all)
                     Default: all
   --lang <lang>     Language for skills: zh (Chinese, default) or en (English)
   --skills-only     Only copy skills/, skip agent config files
@@ -82,6 +82,9 @@ if (command === 'init') {
       ],
       trae: [
         { src: '.trae/rules', dst: '.trae/rules', dir: true }
+      ],
+      codebuddy: [
+        { src: '.codebuddy/rules', dst: '.codebuddy/rules', dir: true }
       ],
       codex: [
         { src: 'AGENTS.md', dst: 'AGENTS.md' }
