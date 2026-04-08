@@ -41,6 +41,52 @@ graph TD
 
 ## Core Capabilities (Passive API)
 
+### 0. Context Mode Selection
+
+When called by the orchestrator, selects the corresponding context acquisition mode based on the input classification result:
+
+| Mode | Description | Scan Scope | Output |
+|------|-------------|-----------|--------|
+| **point-trace** | Locate first, then expand | Target point mentioned by user → trace import/caller → same-module files | Target point + directly related files + local dependency chain |
+| **focused-scan** | Focus on module | Target module full scan + neighboring module summaries + API boundaries | Module details + neighbor summaries + interface boundaries |
+| **broad-scan** | Wide-area scan | Full project file tree + inter-module dependencies + tech stack | Complete structure + module relationships + tech stack |
+| **full-scan** | Full deep scan | Full project + code summaries + domain analysis | Complete context + architectural overview |
+
+```mermaid
+graph TB
+    MODE{"Context Mode"} --> PT["point-trace<br>Locate target point"]
+    MODE --> FS["focused-scan<br>Target module + neighbors"]
+    MODE --> BS["broad-scan<br>Full project structure"]
+    MODE --> FULL["full-scan<br>Full depth"]
+
+    PT --> PT1["1. Locate target file/function from user input"]
+    PT1 --> PT2["2. Trace import/export dependency chain"]
+    PT2 --> PT3["3. Check related files within same module"]
+    PT3 --> PT4["4. Output local context"]
+
+    FS --> FS1["1. Identify target module directory"]
+    FS1 --> FS2["2. Scan all files within module"]
+    FS2 --> FS3["3. Identify neighboring modules + interface boundaries"]
+    FS3 --> FS4["4. Output module-level context"]
+
+    BS --> BS1["1. Scan full project file tree"]
+    BS1 --> BS2["2. Identify inter-module dependency relationships"]
+    BS2 --> BS3["3. Detect tech stack and build configuration"]
+    BS3 --> BS4["4. Output project-level context"]
+
+    FULL --> FULL1["1. Full project file tree + code summaries"]
+    FULL1 --> FULL2["2. Module relationships + domain model"]
+    FULL2 --> FULL3["3. Tech stack + architectural pattern recognition"]
+    FULL3 --> FULL4["4. Output complete context"]
+
+    style PT fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style FS fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style BS fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style FULL fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+```
+
+When not called by the orchestrator (standalone usage), defaults to broad-scan mode.
+
 ### 1. init — Initialize
 
 Called on first use in a project. Scans project file structure, generates initial snapshot.

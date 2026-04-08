@@ -16,6 +16,7 @@ description: >-
 ```mermaid
 graph LR
     INPUT["用户输入<br/>任务描述"]
+    CLASS["输入分类提示<br/>Pinpoint/Bounded/<br>Complex/Grand"]
     CTX["上下文追溯<br/>涉及的文件·模块·依赖"]
     SCORE["多维度评分<br/>5个维度 × 1-5分"]
     LEVEL["难度分级<br/>L1-L5"]
@@ -24,14 +25,28 @@ graph LR
     OUT_BUMP["上浮一级"]
     RESULT["输出<br/>难度报告"]
 
-    INPUT --> CTX --> SCORE --> LEVEL --> THROTTLE
+    INPUT --> CLASS --> CTX --> SCORE --> LEVEL --> THROTTLE
     THROTTLE -->|"是，L1证据充分"| OUT_KEEP --> RESULT
     THROTTLE -->|"否，存在不确定性"| OUT_BUMP --> RESULT
 
     style INPUT fill:#e3f2fd,stroke:#1976d2
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92
     style THROTTLE fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     style RESULT fill:#e8f5e9,stroke:#388e3c
 ```
+
+### 输入分类提示
+
+被 orchestrator 调用时，接收输入分类结果作为评分校准参考（不替代评分）：
+
+| 输入分类 | 分数预期范围 | 说明 |
+|---------|------------|------|
+| Pinpoint | L1-L2 (1-4) | 分类提示为低难度区间，但评分仍可能突破（如目标点涉及复杂依赖链） |
+| Bounded | L2-L3 (2-6) | 分类提示为中低区间 |
+| Complex | L3-L4 (4-8) | 分类提示为中高区间 |
+| Grand | L4-L5 (7-10) | 分类提示为高难度区间 |
+
+如果实际评分与分类提示的预期范围偏差 > 2 级，须在难度报告中标注偏差原因。
 
 ## 难度等级
 

@@ -16,6 +16,7 @@ This Skill serves as a **throttle valve**: assess difficulty before execution, p
 ```mermaid
 graph LR
     INPUT["User Input<br/>Task Description"]
+    CLASS["Input Classification Hint<br/>Pinpoint/Bounded/<br>Complex/Grand"]
     CTX["Context Tracing<br/>Files / Modules / Dependencies involved"]
     SCORE["Multi-dimensional Scoring<br/>5 dimensions x 1-5 points"]
     LEVEL["Difficulty Level<br/>L1-L5"]
@@ -24,14 +25,28 @@ graph LR
     OUT_BUMP["Bump Up One Level"]
     RESULT["Output<br/>Difficulty Report"]
 
-    INPUT --> CTX --> SCORE --> LEVEL --> THROTTLE
+    INPUT --> CLASS --> CTX --> SCORE --> LEVEL --> THROTTLE
     THROTTLE -->|"Yes, L1 evidence sufficient"| OUT_KEEP --> RESULT
     THROTTLE -->|"No, uncertainty exists"| OUT_BUMP --> RESULT
 
     style INPUT fill:#e3f2fd,stroke:#1976d2
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92
     style THROTTLE fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     style RESULT fill:#e8f5e9,stroke:#388e3c
 ```
+
+### Input Classification Hint
+
+When called by the orchestrator, receives the input classification result as a scoring calibration reference (does not replace scoring):
+
+| Input Classification | Expected Score Range | Notes |
+|---------------------|---------------------|-------|
+| Pinpoint | L1-L2 (1-4) | Hint is low-difficulty range, but scoring may exceed (e.g., target involves complex dependency chain) |
+| Bounded | L2-L3 (2-6) | Hint is low-to-mid range |
+| Complex | L3-L4 (4-8) | Hint is mid-to-high range |
+| Grand | L4-L5 (7-10) | Hint is high-difficulty range |
+
+If actual score deviates from the classification hint's expected range by > 2 levels, the deviation reason must be noted in the difficulty report.
 
 ## Difficulty Levels
 

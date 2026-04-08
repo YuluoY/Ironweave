@@ -41,6 +41,52 @@ graph TD
 
 ## 核心能力（被动 API）
 
+### 0. 上下文模式选择
+
+被 orchestrator 调用时，根据输入分类结果选择对应的上下文获取模式：
+
+| 模式 | 说明 | 扫描范围 | 产出 |
+|------|------|---------|------|
+| **point-trace** | 先定位再扩散 | 用户提及的目标点 → 追溯 import/caller → 同模块文件 | 目标点 + 直接关联文件 + 局部依赖链 |
+| **focused-scan** | 聚焦模块 | 目标模块全量 + 相邻模块概要 + API 边界 | 模块详情 + 邻居概要 + 接口边界 |
+| **broad-scan** | 广域扫描 | 全项目文件树 + 模块间依赖 + 技术栈 | 完整结构 + 模块关系 + 技术栈 |
+| **full-scan** | 全量深度扫描 | 全项目 + 代码摘要 + 领域分析 | 完整上下文 + 架构全貌 |
+
+```mermaid
+graph TB
+    MODE{"上下文模式"} --> PT["point-trace<br>定位目标点"]
+    MODE --> FS["focused-scan<br>目标模块 + 邻居"]
+    MODE --> BS["broad-scan<br>全项目结构"]
+    MODE --> FULL["full-scan<br>全量深度"]
+
+    PT --> PT1["1. 根据用户输入定位目标文件/函数"]
+    PT1 --> PT2["2. 追溯 import/export 依赖链"]
+    PT2 --> PT3["3. 检查同模块内关联文件"]
+    PT3 --> PT4["4. 产出局部上下文"]
+
+    FS --> FS1["1. 识别目标模块目录"]
+    FS1 --> FS2["2. 扫描模块内全部文件"]
+    FS2 --> FS3["3. 识别相邻模块 + 接口边界"]
+    FS3 --> FS4["4. 产出模块级上下文"]
+
+    BS --> BS1["1. 扫描全项目文件树"]
+    BS1 --> BS2["2. 识别模块间依赖关系"]
+    BS2 --> BS3["3. 检测技术栈和构建配置"]
+    BS3 --> BS4["4. 产出项目级上下文"]
+
+    FULL --> FULL1["1. 全项目文件树 + 代码摘要"]
+    FULL1 --> FULL2["2. 模块关系 + 领域模型"]
+    FULL2 --> FULL3["3. 技术栈 + 架构模式识别"]
+    FULL3 --> FULL4["4. 产出完整上下文"]
+
+    style PT fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style FS fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style BS fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style FULL fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+```
+
+未被 orchestrator 调用时（独立使用），默认执行 broad-scan 模式。
+
 ### 1. init — 初始化
 
 首次在项目中使用时调用。扫描项目文件结构，生成初始快照。

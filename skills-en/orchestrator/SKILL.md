@@ -1,14 +1,23 @@
 ---
 name: orchestrator
 description: >-
-  Full-lifecycle flow orchestrator for project development. Upon receiving user input, it automatically senses project context, scores task difficulty, selects the optimal route, and orchestrates the Plan→Execute→Validate→Deliver four-phase pipeline with quality gates and failure reflow.
+  Full-lifecycle flow orchestrator for project development. Upon receiving user input, it first classifies the input (4 tiers), then adaptively senses project context, scores task difficulty, selects the optimal route, and orchestrates the Plan→Execute→Validate→Deliver four-phase pipeline with quality gates and failure reflow.
   Use this skill when: the user wants to start a new project, receives a new requirement, needs a full development iteration, wants to go through the complete flow from requirements to delivery, or says things like "start building", "launch the project", "how to implement this requirement", "help me plan this", "do it end-to-end".
   When the user's intent is to complete an end-to-end development task (rather than just one step), use this skill to orchestrate the entire flow. If the user only needs a specific step (e.g., just write requirement docs), use the corresponding specialized skill directly.
 ---
 
 # Orchestrator — Flow Orchestrator
 
-Receive user input → Sense context → Score difficulty → **Macro-level clarification** (if needed) → **Scope slicing** → Select route → Orchestrate four phases per slice → Quality gates → Deliver.
+Receive user input → **Input Classification** → Adaptive context sensing → Score difficulty → **Macro clarification** (if needed) → **Scope slicing** → Select route → Orchestrate four phases per slice → Quality gates → Deliver.
+
+---
+
+## Global Constraints
+
+The following two rules apply across all phases and skills, no exceptions:
+
+1. **Evidence Anchoring**: Every design decision must cite at least one **project context fact** as justification. Using only "industry best practice" or "generally recommended" as the sole rationale is prohibited. If no supporting evidence exists in the project context, it must be explicitly marked as "**Assumption**".
+2. **Reverse Challenge**: After recommending an architecture, technology choice, or design pattern, you must answer: **If this recommendation is wrong, what is the most likely reason?** If you cannot answer, your understanding is insufficient — gather more context before proceeding.
 
 ---
 
@@ -16,9 +25,10 @@ Receive user input → Sense context → Score difficulty → **Macro-level clar
 
 ```mermaid
 graph TB
-    INPUT["User Input"] --> CTX["Context Sensing<br>project-context"]
+    INPUT["User Input"] --> CLASS["Input Classification<br>4-Dimension Analysis"]
+    CLASS --> CTX["Adaptive Context Sensing<br>project-context"]
     CTX --> SCORE["Difficulty Scoring<br>task-difficulty"]
-    SCORE --> NEED_CL{"Requirements ambiguous<br>OR L4+?"}
+    SCORE --> NEED_CL{"Classification=Grand<br>OR ambiguous<br>OR L4+?"}
     NEED_CL -->|"Yes"| CLARIFY["Macro Clarification<br>requirement-qa(scope mode)<br>+ brainstorm(L4+)"]
     NEED_CL -->|"No"| SLICE
     CLARIFY --> SLICE["Scope Slicing<br>scope-sizer"]
@@ -39,6 +49,7 @@ graph TB
     NEXT -->|"No"| DONE["All Complete"]
 
     style INPUT fill:#e8eaf6,stroke:#283593,color:#1a237e,stroke-width:2px
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92,stroke-width:2px
     style CTX fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
     style SCORE fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
     style NEED_CL fill:#fff3e0,stroke:#e65100,color:#bf360c
@@ -55,13 +66,94 @@ graph TB
 
 ---
 
-## 1. Context Sensing
+## 0. Input Classification
 
-Use project-context to gather project information and determine project type:
+Before touching any skill, perform a 4-dimension analysis based solely on the **user's input text**, producing a classification result that drives all subsequent steps to choose the appropriate depth.
+
+### 4-Dimension Assessment
+
+| Dimension | Description | Low → High |
+|-----------|-------------|------------|
+| **Concreteness** | How precisely does the user point to a target | Specific file/function → A module → A system → Macro vision |
+| **Scope Breadth** | How many modules are implicitly involved | Single point → Single module → Multi-module → Full system |
+| **Decision Load** | Are architectural/strategic decisions required | None → Minor → Significant → Critical |
+| **Ambiguity** | How much is still undefined | Fully clear → Some gaps → Major gaps → Mostly undefined |
+
+### 4-Tier Classification
+
+```mermaid
+graph TB
+    INPUT["User Input Text"] --> DIM["4-Dimension Assessment<br>Concreteness / Scope / Decision / Ambiguity"]
+    DIM --> C1{"High concrete + Narrow<br>+ No decision + Clear?"}
+    C1 -->|"Yes"| PIN["Pinpoint"]
+    C1 -->|"No"| C2{"Medium concrete + Bounded<br>+ Minor decision + Partially clear?"}
+    C2 -->|"Yes"| BND["Bounded"]
+    C2 -->|"No"| C3{"Abstract + Wide<br>+ Decisions needed + Gaps?"}
+    C3 -->|"Yes"| CPX["Complex"]
+    C3 -->|"No"| GRD["Grand"]
+
+    style INPUT fill:#e8eaf6,stroke:#283593,color:#1a237e,stroke-width:2px
+    style DIM fill:#ede7f6,stroke:#4527a0,color:#311b92
+    style PIN fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style BND fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style CPX fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style GRD fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+```
+
+| Classification | Typical Input | Context Strategy | Difficulty Hint | CLARIFY |
+|---------------|---------------|-----------------|----------------|---------|
+| **Pinpoint** | "GET /api/users/123 returns 500"<br>"Change login button color to blue" | **point-trace** | L1-L2 | Skip |
+| **Bounded** | "Add change-password feature to user module"<br>"Optimize order list query performance" | **focused-scan** | L2-L3 | As needed |
+| **Complex** | "Add payment module integrating WeChat Pay and Alipay"<br>"Split monolith into frontend-backend separation" | **broad-scan** | L3-L4 | As needed |
+| **Grand** | "Build an e-commerce platform like Amazon"<br>"Design a distributed transaction framework" | **full-scan** | L4-L5 | **Mandatory** |
+
+### User Override
+
+Users can override the classification at any time with natural language: "keep it simple" → downgrade, "do it thoroughly" → upgrade.
+
+---
+
+## 1. Adaptive Context Sensing
+
+Based on the input classification result, use project-context's **corresponding mode** to gather project information.
+
+### 4 Context Modes
+
+| Mode | Triggered By | What It Does | Output |
+|------|-------------|-------------|--------|
+| **point-trace** | Pinpoint | Locate the target point (file/function/error) mentioned by user → trace import/caller dependencies → check same-module boundaries | Target point + directly related files + local dependency chain |
+| **focused-scan** | Bounded | Scan target module + neighboring modules + interface boundaries | Target module details + neighbor summaries + API boundaries |
+| **broad-scan** | Complex | Scan full project architecture + module relationships + tech stack | Complete project structure + module relationship map + tech stack summary |
+| **full-scan** | Grand | Full project scan (if code repo exists) + domain analysis | Complete project context + architectural overview + domain analysis |
+
+```mermaid
+graph TB
+    CLASS["Classification Result"] --> MODE{"Classification Tier"}
+    MODE -->|"Pinpoint"| PT["point-trace<br>Locate target, trace dependencies"]
+    MODE -->|"Bounded"| FS["focused-scan<br>Target module + neighbors"]
+    MODE -->|"Complex"| BS["broad-scan<br>Full project architecture"]
+    MODE -->|"Grand"| FULL["full-scan<br>Complete deep scan"]
+
+    PT --> TYPE["Determine Project Type"]
+    FS --> TYPE
+    BS --> TYPE
+    FULL --> TYPE
+
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92,stroke-width:2px
+    style PT fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style FS fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style BS fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style FULL fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+    style TYPE fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+```
+
+### Project Type Determination
+
+After context sensing completes, determine project type (regardless of classification — all modes do this):
 
 ```mermaid
 graph LR
-    CTX_START["project-context"] --> HAS_CODE{"Has code repo?"}
+    CTX_START["Context Sensing Complete"] --> HAS_CODE{"Has code repo?"}
     HAS_CODE -->|"None/Empty/Scaffold only"| NEW["A: New Project"]
     HAS_CODE -->|"Has substantial code"| INTENT{"User intent?"}
     INTENT -->|"Error or anomaly"| BUG["C: Bug Fix"]
@@ -98,6 +190,7 @@ After difficulty scoring and before scope slicing, determine whether the require
 
 | Condition | Criteria |
 |-----------|---------|
+| Input classified as Grand | Already determined as Grand type in classification phase — **mandatory trigger** |
 | Vague/broad requirements | User input doesn't explicitly list feature modules or specific scope |
 | Difficulty L4+ | task-difficulty score ≥ 7, architectural direction affects slicing approach |
 
@@ -105,6 +198,7 @@ After difficulty scoring and before scope slicing, determine whether the require
 
 | Condition | Example |
 |-----------|---------|
+| Input classified as Pinpoint or Bounded | Already confirmed specific target and bounded scope in classification phase |
 | Requirements already specific | "Add a change-password API to the user module", "GET /api/novels/123 returns 500" |
 | Difficulty L1-L3 | Simple tasks, naturally narrow scope |
 
@@ -207,6 +301,15 @@ When multiple slices exist, execute them sequentially by dependency order. Each 
 - **First slice**: Runs the complete Plan skill chain (including global skills: tech-stack, engineering-principles, etc.; global outputs are reused by subsequent slices)
 - **Subsequent slices**: Plan phase skips global skills, only executes slice-level skills (requirement-qa targeting this slice's features, spec-writing only for this slice's docs, api-contract-design only for incremental endpoints)
 - **Inter-slice handoff**: Previous slice's Deliver output (docs/ + .cache/context.db) becomes the next slice's Plan input
+
+### Context Window Management
+
+The Plan phase's sequential skill chain accumulates substantial intermediate output in the context window. To prevent window overflow and attention degradation, follow these rules:
+
+- **Persist then release**: After each skill's output is written to docs/, subsequent skills should NOT rely on the full text being "remembered" in the window. When referencing prior output, **read from files** instead of relying on window memory
+- **Keep only summaries**: Retain only each skill's output summary in the window (core conclusions, key decisions, module list); consult docs/ for full documents
+- **Slice boundaries are reset points**: When entering a new Slice, load required context from docs/ + .cache/context.db rather than trying to "remember" everything from the previous Slice
+- **Load SKILL.md on demand**: Each skill's SKILL.md is read when that skill is invoked; its detailed instructions do not need to persist in the window after use
 
 ### Plan
 

@@ -68,3 +68,23 @@ graph TB
 - 仅用于无需 AI 介入的 CLI 工具（安装、编译、测试执行、lint）
 - 启动后主线程继续编写下一模块，稍后检查后台输出
 - 后台进程失败不阻塞主线程，但结果需在 Validate 卡点前确认
+
+## SubAgent 降级策略
+
+当 Agent 宿主环境不支持 SubAgent（或 SubAgent 能力有限）时，所有 SubAgent 场景**退回主 Agent 串行执行**。架构设计保证不依赖 SubAgent 的并行性——SubAgent 是性能优化，不是功能前提。
+
+### 降级映射
+
+| SubAgent 场景 | 正常模式 | 降级模式 |
+|--------------|---------|---------|
+| brainstorm 多角色 | 6 个 SubAgent 并行扮演不同角色 | 主 Agent 依次扮演每个角色，串行输出各视角分析 |
+| A+ Plan 三件套 | 3 个 SubAgent 并行（performance + complexity + observability） | 主 Agent 串行依次执行三个 skill |
+| + 变体 Execute | 每个 task 由 fresh SubAgent 隔离执行 | 主 Agent 按 task 串行执行，在 task 间自行做上下文分隔（明确标注："--- Task N 开始 ---"） |
+| Deliver 双写 | 2 个 SubAgent 并行（docs-output + project-context） | 主 Agent 先执行 docs-output，再执行 project-context |
+
+### 降级检测
+
+模型在首次需要 SubAgent 时检测宿主环境：
+- 如果宿主提供 SubAgent/fork/spawn 能力 → 使用 SubAgent 模式
+- 如果不提供 → 切换到降级模式，后续同一会话不再重复检测
+- 降级不影响质量卡点——Plan Gate / Validate Gate 的检查规则完全一致

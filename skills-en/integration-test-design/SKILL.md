@@ -33,6 +33,21 @@ graph TB
 
 ---
 
+## 0. TDD Applicability by Project Maturity
+
+Before designing test strategy, determine TDD scope based on project maturity:
+
+| Project State | TDD Strategy | Rationale |
+|--|--|--|
+| New project (greenfield) | **Full TDD** — all new code gets tests first | Lowest cost, highest ROI; test infrastructure set up once |
+| Mature project — existing code | **Don't backfill tests** | ROI too low, unless the module is about to be refactored |
+| Mature project — new/modified code | **TDD for new code** | Only low-cost opportunity to introduce a safety net; coverage improves incrementally |
+| Bug fixes | **Regression test required** | Regression test is the core deliverable of a bug fix |
+
+> **Principle**: Don't launch a pointless test-backfilling campaign on legacy code. Instead, bring tests with every change — coverage will naturally improve over months.
+
+---
+
 ## 1. Identify Integration Points
 
 Extract all cross-layer/cross-module calls from sequence design, marking test levels:

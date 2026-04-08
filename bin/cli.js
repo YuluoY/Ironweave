@@ -16,7 +16,7 @@ Usage:
 
 Options:
   --agent <name>    Only install config for specific agent
-                    (claude, copilot, cursor, windsurf, cline, codex, gemini, all)
+                    (claude, copilot, cursor, windsurf, cline, trae, codex, gemini, all)
                     Default: all
   --lang <lang>     Language for skills: zh (Chinese, default) or en (English)
   --skills-only     Only copy skills/, skip agent config files
@@ -66,29 +66,28 @@ if (command === 'init') {
   if (!skillsOnly) {
     const agentFiles = {
       claude: [
-        { src: 'CLAUDE.md', dst: 'CLAUDE.md' },
-        { src: '.claude-plugin', dst: '.claude-plugin', dir: true }
+        { src: 'CLAUDE.md', dst: 'CLAUDE.md' }
       ],
       copilot: [
         { src: '.github/copilot-instructions.md', dst: '.github/copilot-instructions.md' }
       ],
       cursor: [
-        { src: '.cursorrules', dst: '.cursorrules' },
-        { src: '.cursor-plugin', dst: '.cursor-plugin', dir: true }
+        { src: '.cursor/rules', dst: '.cursor/rules', dir: true }
       ],
       windsurf: [
-        { src: '.windsurfrules', dst: '.windsurfrules' }
+        { src: '.windsurf/rules', dst: '.windsurf/rules', dir: true }
       ],
       cline: [
-        { src: '.clinerules', dst: '.clinerules' }
+        { src: '.clinerules', dst: '.clinerules', dir: true }
+      ],
+      trae: [
+        { src: '.trae/rules', dst: '.trae/rules', dir: true }
       ],
       codex: [
-        { src: 'AGENTS.md', dst: 'AGENTS.md' },
-        { src: '.codex', dst: '.codex', dir: true }
+        { src: 'AGENTS.md', dst: 'AGENTS.md' }
       ],
       gemini: [
-        { src: 'GEMINI.md', dst: 'GEMINI.md' },
-        { src: 'gemini-extension.json', dst: 'gemini-extension.json' }
+        { src: 'GEMINI.md', dst: 'GEMINI.md' }
       ]
     };
 

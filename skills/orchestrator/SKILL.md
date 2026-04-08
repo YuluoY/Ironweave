@@ -1,14 +1,23 @@
 ---
 name: orchestrator
 description: >-
-  项目开发全生命周期的流程编排器。接收用户输入后，自动感知项目上下文、评估任务难度、选择最优路径，编排 Plan→Execute→Validate→Deliver 四阶段并管理质量卡点和失败回流。
+  项目开发全生命周期的流程编排器。接收用户输入后，先做输入分类（4 档），自适应感知项目上下文、评估任务难度、选择最优路径，编排 Plan→Execute→Validate→Deliver 四阶段并管理质量卡点和失败回流。
   务必在以下场景使用本 skill：用户要开始一个新项目、接到一个新需求、要做一次完整的开发迭代、要从需求到交付走一遍完整流程，或者用户说"开始做"、"启动项目"、"这个需求怎么落地"、"帮我规划一下"、"从头到尾做一遍"。
   当用户的意图是完成一个端到端的开发任务（而不是只做其中某一步），使用本 skill 来编排整个流程。如果用户只需要其中某一步（如只写需求文档），直接使用对应的专项 skill。
 ---
 
 # Orchestrator — 流程编排器
 
-接收用户输入 → 感知上下文 → 评估难度 → **宏观澄清**（按需）→ **范围切片** → 选路径 → 逐 slice 编排四阶段 → 质量卡点 → 交付。
+接收用户输入 → **输入分类** → 自适应上下文感知 → 评估难度 → **宏观澄清**（按需）→ **范围切片** → 选路径 → 逐 slice 编排四阶段 → 质量卡点 → 交付。
+
+---
+
+## 全局约束
+
+以下两条规则贯穿所有阶段和 skill，不可豁免：
+
+1. **证据锚定**：每个设计决策必须引用至少一条**项目上下文事实**作为依据。禁止仅用“业界最佳实践”或“通常建议”作为唯一理由。如果项目上下文中找不到支撑证据，必须明确标注“**假设**”。
+2. **反向质疑**：推荐架构方案、技术选型或设计模式后，必须回答：**如果这个方案是错的，最可能的原因是什么？** 如果无法回答，说明理解不够深入，需要补充上下文。
 
 ---
 
@@ -16,9 +25,10 @@ description: >-
 
 ```mermaid
 graph TB
-    INPUT["用户输入"] --> CTX["上下文感知<br>project-context"]
+    INPUT["用户输入"] --> CLASS["输入分类<br>4 维度分析"]
+    CLASS --> CTX["自适应上下文感知<br>project-context"]
     CTX --> SCORE["难度评估<br>task-difficulty"]
-    SCORE --> NEED_CL{"需求模糊<br>OR L4+?"}
+    SCORE --> NEED_CL{"分类=Grand<br>OR 需求模糊<br>OR L4+?"}
     NEED_CL -->|"是"| CLARIFY["宏观澄清<br>requirement-qa(scope模式)<br>+ brainstorm(L4+)"]
     NEED_CL -->|"否"| SLICE
     CLARIFY --> SLICE["范围切片<br>scope-sizer"]
@@ -39,6 +49,7 @@ graph TB
     NEXT -->|"否"| DONE["全部完成"]
 
     style INPUT fill:#e8eaf6,stroke:#283593,color:#1a237e,stroke-width:2px
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92,stroke-width:2px
     style CTX fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
     style SCORE fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
     style NEED_CL fill:#fff3e0,stroke:#e65100,color:#bf360c
@@ -55,13 +66,94 @@ graph TB
 
 ---
 
-## 1. 上下文感知
+## 0. 输入分类（Input Classification）
 
-用 project-context 获取项目信息，判定项目类型：
+在触碰任何 skill 之前，仅基于**用户输入文本**做 4 维度分析，产出分类结果，驱动后续所有步骤选择适当的深度。
+
+### 4 维度评估
+
+| 维度 | 说明 | 低 → 高 |
+|------|------|---------|
+| **具体性** (Concreteness) | 用户指向的目标有多精确 | 具体文件/函数 → 某个模块 → 某个系统 → 宏观愿景 |
+| **范围广度** (Scope Breadth) | 隐含涉及多少模块 | 单点 → 单模块 → 多模块 → 全系统 |
+| **决策负载** (Decision Load) | 是否需要架构/策略层面的决策 | 无 → 少量 → 显著 → 关键 |
+| **模糊度** (Ambiguity) | 还有多少东西未定义 | 全清晰 → 部分缺口 → 大量缺口 → 几乎未定义 |
+
+### 4 档分类
+
+```mermaid
+graph TB
+    INPUT["用户输入文本"] --> DIM["4 维度评估<br>具体性 / 范围 / 决策 / 模糊度"]
+    DIM --> C1{"高具体 + 窄范围<br>+ 无决策 + 清晰?"}
+    C1 -->|"是"| PIN["Pinpoint 针对性"]
+    C1 -->|"否"| C2{"中等具体 + 有界<br>+ 少量决策 + 部分清晰?"}
+    C2 -->|"是"| BND["Bounded 有边界"]
+    C2 -->|"否"| C3{"抽象 + 宽范围<br>+ 有决策 + 有缺口?"}
+    C3 -->|"是"| CPX["Complex 复合型"]
+    C3 -->|"否"| GRD["Grand 宏大型"]
+
+    style INPUT fill:#e8eaf6,stroke:#283593,color:#1a237e,stroke-width:2px
+    style DIM fill:#ede7f6,stroke:#4527a0,color:#311b92
+    style PIN fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style BND fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style CPX fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style GRD fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+```
+
+| 分类 | 典型输入 | Context 策略 | 难度提示 | CLARIFY |
+|------|---------|-------------|---------|---------|
+| **Pinpoint** | "GET /api/users/123 返回 500"<br>"把登录按钮颜色改成蓝色" | **point-trace** | L1-L2 | 跳过 |
+| **Bounded** | "给 user 模块加修改密码功能"<br>"优化订单列表的查询性能" | **focused-scan** | L2-L3 | 按需 |
+| **Complex** | "增加支付模块，要对接微信和支付宝"<br>"把单体拆成前后端分离" | **broad-scan** | L3-L4 | 按需 |
+| **Grand** | "做一个类似淘宝的电商平台"<br>"设计一个分布式事务框架" | **full-scan** | L4-L5 | **强制** |
+
+### 用户覆盖
+
+用户可在任何时刻用自然语言覆盖分类："简单处理" → 降档，"认真做" → 升档。
+
+---
+
+## 1. 自适应上下文感知
+
+根据输入分类结果，用 project-context 的**对应模式**获取项目信息。
+
+### 4 种 Context 模式
+
+| 模式 | 触发分类 | 做什么 | 产出 |
+|------|---------|--------|------|
+| **point-trace** | Pinpoint | 定位用户提及的目标点（文件/函数/错误） → 追溯 import/caller 依赖 → 检查同模块边界 | 目标点 + 直接关联文件列表 + 局部架构 |
+| **focused-scan** | Bounded | 扫描目标模块 + 相邻模块 + 接口边界 | 目标模块详情 + 邻居模块概要 + API 边界 |
+| **broad-scan** | Complex | 扫描全项目架构 + 模块关系 + 技术栈 | 完整项目结构 + 模块关系图 + 技术栈概要 |
+| **full-scan** | Grand | 完整项目扫描（如果有代码仓库） + 领域分析 | 完整项目上下文 + 架构全貌 + 领域分析 |
+
+```mermaid
+graph TB
+    CLASS["输入分类结果"] --> MODE{"分类档位"}
+    MODE -->|"Pinpoint"| PT["point-trace<br>定位目标 → 追溯依赖链"]
+    MODE -->|"Bounded"| FS["focused-scan<br>目标模块 + 相邻模块"]
+    MODE -->|"Complex"| BS["broad-scan<br>全项目架构 + 模块关系"]
+    MODE -->|"Grand"| FULL["full-scan<br>完整扫描 + 领域分析"]
+
+    PT --> TYPE["判定项目类型"]
+    FS --> TYPE
+    BS --> TYPE
+    FULL --> TYPE
+
+    style CLASS fill:#ede7f6,stroke:#4527a0,color:#311b92,stroke-width:2px
+    style PT fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style FS fill:#fff9c4,stroke:#f9a825,color:#e65100
+    style BS fill:#ffe0b2,stroke:#e65100,color:#bf360c
+    style FULL fill:#ffcdd2,stroke:#c62828,color:#b71c1c
+    style TYPE fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+```
+
+### 项目类型判定
+
+上下文感知完成后，判定项目类型（与分类无关，所有模式都做）：
 
 ```mermaid
 graph LR
-    CTX_START["project-context"] --> HAS_CODE{"有代码仓库?"}
+    CTX_START["上下文感知完成"] --> HAS_CODE{"有代码仓库?"}
     HAS_CODE -->|"无/空/仅脚手架"| NEW["A: 新项目"]
     HAS_CODE -->|"有完整代码"| INTENT{"用户意图?"}
     INTENT -->|"错误或异常"| BUG["C: Bug 修复"]
@@ -98,6 +190,7 @@ graph LR
 
 | 条件 | 判定依据 |
 |------|---------|
+| 输入分类为 Grand | 输入分类阶段已判定为宏大型 — **强制触发** |
 | 需求模糊/宽泛 | 用户输入未明确列出功能模块或具体范围 |
 | 难度 L4+ | task-difficulty 评分 ≥ 7，架构方向会影响切片方式 |
 
@@ -105,6 +198,7 @@ graph LR
 
 | 条件 | 示例 |
 |------|------|
+| 输入分类为 Pinpoint 或 Bounded | 已在分类阶段确认目标具体、范围有界 |
 | 需求已经具体 | "在 user 模块加修改密码 API"、"GET /api/novels/123 返回 500" |
 | 难度 L1-L3 | 简单任务，天然范围窄 |
 
@@ -207,6 +301,15 @@ graph TB
 - **第一个 slice**：走完整 Plan skill 链（含全局性 skill：tech-stack、engineering-principles 等，全局产出复用给后续 slice）
 - **后续 slice**：Plan 阶段跳过全局性 skill，只执行 slice 级 skill（requirement-qa 针对本 slice 功能、spec-writing 只写本 slice 文档、api-contract-design 只做增量端点）
 - **slice 间传递**：前一个 slice 的 Deliver 产出（docs/ + .cache/context.db）是后续 slice 的 Plan 输入
+
+### 上下文窗口管理
+
+Plan 阶段的顺序 skill 链会在上下文窗口中累积大量中间产出。为防止窗口溢出导致注意力衰减，遵循以下规则：
+
+- **落盘即释放**：每个 skill 产出写入 docs/ 后，后续 skill 不应依赖窗口中"记住"的全文。需要引用前置产出时，**从文件读取**而非依赖窗口记忆
+- **只保留摘要**：在窗口中仅保留每个 skill 的产出摘要（核心结论、关键决策、模块清单），完整文档查阅 docs/
+- **Slice 边界是重置点**：进入新 Slice 时，从 docs/ + .cache/context.db 加载所需上下文，而非试图"记住"前一个 Slice 的全部内容
+- **按需加载 SKILL.md**：每个 skill 的 SKILL.md 在调用该 skill 时读取，使用完毕后其详细指令不需要在窗口中持续保留
 
 ### Plan
 

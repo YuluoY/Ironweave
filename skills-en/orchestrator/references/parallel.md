@@ -68,3 +68,23 @@ Used only in + variant Execute phase. Detailed rules -> read `references/execute
 - Only for CLI tools requiring no AI involvement (install, compile, test execution, lint)
 - After launching, main thread continues writing next module, checks background output later
 - Background process failure doesn't block main thread, but results must be confirmed before Validate gate
+
+## SubAgent Degradation Strategy
+
+When the agent host environment does not support SubAgents (or has limited SubAgent capability), all SubAgent scenarios **fall back to main Agent sequential execution**. The architecture is designed to never depend on SubAgent parallelism — SubAgents are a performance optimization, not a functional prerequisite.
+
+### Degradation Mapping
+
+| SubAgent Scenario | Normal Mode | Degraded Mode |
+|-------------------|-------------|---------------|
+| brainstorm multi-role | 6 SubAgents in parallel playing different roles | Main Agent plays each role sequentially, outputting each perspective's analysis in turn |
+| A+ Plan triple-skill | 3 SubAgents in parallel (performance + complexity + observability) | Main Agent executes all three skills sequentially |
+| + variant Execute | Each task by fresh SubAgent with context isolation | Main Agent executes tasks sequentially, self-separating context between tasks (explicitly marking: "--- Task N Start ---") |
+| Deliver dual-write | 2 SubAgents in parallel (docs-output + project-context) | Main Agent executes docs-output first, then project-context |
+
+### Degradation Detection
+
+The model detects the host environment when SubAgents are first needed:
+- If the host provides SubAgent/fork/spawn capability → use SubAgent mode
+- If not → switch to degraded mode; do not re-detect within the same session
+- Degradation does not affect quality gates — Plan Gate / Validate Gate checks remain identical
