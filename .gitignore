@@ -22,3 +22,6 @@ dist/
 # Cache
 .cache/
 *.db
+
+# Python
+__pycache__/

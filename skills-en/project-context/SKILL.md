@@ -120,6 +120,41 @@ Compares db info with actual source code, marks stale entries:
 - File deleted -> marked as `deleted`
 - File content changed but summary not updated -> marked as `stale`
 
+### 5. deps — Dependency Scanning
+
+Scans all source code files, extracts import/require static dependencies, writes to `dependencies` table:
+
+- TypeScript/JavaScript: ES import, CJS require, dynamic import, re-export
+- Python: import / from...import (prefers `ast` module, falls back to regex on syntax error)
+- Java: import statements
+- Only records dependencies between project-internal files (external packages skipped)
+
+> Implementation → `scripts/dep_extractor.py`
+
+### 6. stale-check — Sampling Freshness Check
+
+Quick assessment of whether db needs a sync:
+
+- Randomly samples 20 active files from `file_tree`
+- Compares mtime for changes
+- If >20% files stale → returns `recommendation: "sync"`
+- Agent runs stale-check first during context awareness stage; if sync needed, syncs before continuing
+
+### 7. Knowledge Extraction (Deliver Stage)
+
+After each Deliver completes, the AI agent extracts semantic-level knowledge discovered during the task:
+
+**knowledge_edges (relationship graph)**:
+- Reviews files and symbols involved in the current task
+- Extracts call relationships (calls), inheritance (extends), event triggers (triggers), data reads/writes (reads/writes), etc.
+- Writes to `knowledge_edges` table via INSERT OR REPLACE
+- Confidence rules: task completed and user did not challenge → `validated`; inferred → `inferred`
+
+**knowledge_flows (business flows)**:
+- If the current task involves cross-module business processes (e.g., user registration, order creation)
+- Extracts complete step chain (file → symbol → action)
+- Writes to `knowledge_flows` table
+
 ## Database Schema Overview
 
 | Table | Purpose |
@@ -127,6 +162,9 @@ Compares db info with actual source code, marks stale entries:
 | `project_meta` | Project metadata (name, root path, monorepo structure, Node version, etc.) |
 | `file_tree` | File tree snapshot (path, type, size, mtime, hash, status, classification) |
 | `code_summary` | Code structure summary (file -> exported function/class/interface signatures) |
+| `dependencies` | Inter-file static dependencies (import/require relationships, auto-extracted by script) |
+| `knowledge_edges` | Semantic relationship graph (function calls, inheritance, event triggers, etc., extracted by AI at Deliver stage) |
+| `knowledge_flows` | Business flow chains (cross-module business process steps, extracted by AI at Deliver stage) |
 
 > Full schema (including field definitions and indexes) → `references/schema.md`
 
@@ -134,16 +172,19 @@ Compares db info with actual source code, marks stale entries:
 
 For large projects (> 500 files), vectorization can be enabled for semantic search. Current version uses keyword full-text search (SQLite FTS5) as primary; vectorization is a future upgrade path.
 
-## Python Script
+## Python Scripts
 
 ```bash
-python scripts/context_db.py init     --root <project_root>
-python scripts/context_db.py sync     --root <project_root>
-python scripts/context_db.py query    --root <project_root> --scope structure|meta [--module <path>] [--keyword <term>]
-python scripts/context_db.py validate --root <project_root>
+python scripts/context_db.py init        --root <project_root>
+python scripts/context_db.py sync        --root <project_root>
+python scripts/context_db.py deps        --root <project_root>
+python scripts/context_db.py stale-check --root <project_root> [--sample <n>]
+python scripts/context_db.py knowledge   --root <project_root> --type edges|flows --data <JSON> [--session <hash>]
+python scripts/context_db.py query       --root <project_root> --scope structure|meta [--module <path>] [--keyword <term>]
+python scripts/context_db.py validate    --root <project_root>
 ```
 
-> Script implementation → `scripts/context_db.py`
+> Script implementations → `scripts/context_db.py`, `scripts/dep_extractor.py`
 
 ## Common Issues
 

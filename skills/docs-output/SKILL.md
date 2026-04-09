@@ -127,7 +127,14 @@ Review PR #42，无变更
 - 自动创建模块目录（如不存在）
 - 生成空白文档（仅包含一级标题）
 
-### 2. progress — 记录进度
+### 2. update — 创建或更新模块文档（含内容）
+
+创建或覆盖指定模块文档，内容由参数提供。Deliver 阶段强制使用此命令。
+
+- 不存在则创建，已存在则覆盖更新
+- `--content` 参数传入完整 Markdown 正文（包含功能描述、接口定义、技术决策等）
+
+### 3. progress — 记录进度
 
 创建或追加会话进度记录。
 
@@ -135,15 +142,15 @@ Review PR #42，无变更
 - 传入 `--session-id`：追加条目到已有文件，每条记录带 `[HH:mm:ss]` 秒级时间
 - 返回 `session_id`，后续调用复用
 
-### 3. list — 列出文档
+### 4. list — 列出文档
 
 按模块和进度分别列出 docs/ 下所有内容。
 
-### 4. validate — 校验目录
+### 5. validate — 校验目录
 
 检查文档目录的基本健康状态。
 
-### 5. archive — 归档旧进度
+### 6. archive — 归档旧进度
 
 将超过 30 天的进度记录移入 `progress/archive/YYYY-MM/`。
 
@@ -158,6 +165,7 @@ Review PR #42，无变更
 
 ```bash
 python scripts/docs_manager.py create   --root <project_root> --module <模块名> --name <文档名> [--title <一级标题>]
+python scripts/docs_manager.py update   --root <project_root> --module <模块名> --name <文档名> --content <内容> [--title <标题>]
 python scripts/docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--session-id <会话ID>] [--files <变更文件JSON>] [--decisions <决策>] [--todos <遗留>]
 python scripts/docs_manager.py list     --root <project_root>
 python scripts/docs_manager.py validate --root <project_root>

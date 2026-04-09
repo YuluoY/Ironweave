@@ -286,18 +286,26 @@ ironweave/
 
 ## Philosophy
 
-Ironweave is built around one insight: **AI coding agents have systematic cognitive weaknesses** — they underestimate complexity, skip validation, lose context across sessions, and forget what they planned. Every mechanism in Ironweave targets a specific weakness.
+### Core Principles
 
-- **Path Lock, Not Suggestions** — Flowcharts in route files are mandatory execution paths, not references. Every node must be executed in arrow order. AI is not trusted to self-police completeness.
-- **Throttle Before You Build** — Difficulty scoring with built-in upward bias acts as a throttle valve. Because AI systematically underestimates complexity, the score is nudged up unless the task is clearly trivial.
-- **Weight Matches Problem** — Three variants (lite / standard / plus) ensure simple tasks stay fast and hard tasks get full rigor. The overhead of the process should match the risk of the problem.
-- **Evidence, Not Vibes** — Every decision must anchor to project context facts. "Industry best practice" alone is not a valid justification. If no evidence is found, the assumption must be explicitly labeled.
-- **Recommended ≠ Mandatory** — Tech reference tables provide default recommendations for quick decisions, but users can choose any technology — including ones not listed. The human always has the final say.
-- **Persist Then Forget** — Each skill writes output to files. Subsequent steps read from files, never from window memory. This directly counters AI context window overflow and attention decay.
-- **Reflow, Not Restart** — When validation fails, work routes back to the exact level that broke: code-level → Execute, design-level → Plan, requirement-level → scope. No full teardowns for local issues.
-- **Mechanical Reconciliation** — At delivery, a checklist comparison (Plan outputs vs. actual files) catches gaps that AI memory would miss. Trust the filesystem, not the model.
-- **Source Is Truth** — All caches, databases, and generated docs are derivatives of source. When conflicts arise, source wins.
-- **Human Override Always** — Users can override classification and difficulty with natural language at any point. The system has defaults; humans have final authority.
+**Document-Driven Development** — Specs precede code. Every feature starts as a structured document (`specs/`), becoming the single source of truth for requirements, tech decisions, and API contracts. Code implements specs; specs don't retroactively describe code.
+
+**Full Traceability** — Every technical decision records *why* it was chosen and *what alternatives were considered*. Progress is persistently tracked (`docs/`). Cross-session context is preserved in SQLite. Nothing relies on memory alone.
+
+**Counter AI Cognitive Weaknesses** — AI agents systematically underestimate complexity, skip validation, lose context across sessions, and forget plans. Ironweave's mechanisms directly target these weaknesses: path lock prevents skipping, difficulty throttle counters underestimation, file persistence defeats context loss, mechanical reconciliation catches omissions.
+
+**Human Authority, Machine Execution** — The system provides defaults and recommendations, but humans have unconditional override. Tech choices are recommended, not mandatory. Difficulty scores can be overridden with natural language. AI executes the workflow; humans own the decisions.
+
+**Adaptive Overhead** — Process weight must match problem weight. Simple tasks (lite) skip optional skills for speed. Medium tasks (standard) get the full chain. Hard tasks (plus) add extra review stages and parallel strategies. No one-size-fits-all.
+
+### Design Mechanisms
+
+- **Path Lock** — Route flowcharts are mandatory execution paths, not references. Every node runs in arrow order, no skipping.
+- **Throttle Valve** — Built-in upward bias in difficulty scoring. AI tends to underestimate, so scores nudge up unless clearly trivial.
+- **Persist Then Forget** — Each skill writes output to files. Subsequent steps read from files, not from context window. Counters attention decay.
+- **Precision Reflow** — Validation failures route back to the exact broken level (code → Execute, design → Plan, requirement → scope), not full restart.
+- **Mechanical Reconciliation** — Delivery compares Plan checklist vs. actual files. Trust the filesystem, not the model's recall.
+- **Recommended ≠ Mandatory** — Tech reference tables have defaults, but any technology is valid if the reasoning is documented.
 
 ## Contributing
 

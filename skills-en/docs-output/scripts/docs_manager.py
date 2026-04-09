@@ -4,6 +4,7 @@ docs-output: 文档产出管理脚本（模块文档 + 进度记录）
 
 用法:
     python docs_manager.py create   --root <project_root> --module <模块名> --name <文档名> [--title <标题>]
+    python docs_manager.py update   --root <project_root> --module <模块名> --name <文档名> --content <内容> [--title <标题>]
     python docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--session-id <ID>] [--files <JSON>] [--decisions <决策>] [--todos <遗留>]
     python docs_manager.py list     --root <project_root>
     python docs_manager.py validate --root <project_root>
@@ -346,6 +347,28 @@ def cmd_archive(root: str, older_than: int = 30):
     print(json.dumps({"status": "ok", "archived_days": archived, "cutoff": cutoff}))
 
 
+def cmd_update(root: str, module: str, name: str, content: str, title: str | None = None):
+    """创建或更新模块文档，内容由参数提供。"""
+    docs_dir = get_docs_dir(root)
+    module_dir = docs_dir / module
+    module_dir.mkdir(parents=True, exist_ok=True)
+
+    filepath = module_dir / f"{name}.md"
+    doc_title = title or name
+    is_new = not filepath.exists()
+
+    full_content = f"# {doc_title}\n\n{content}\n"
+    filepath.write_text(full_content, encoding="utf-8")
+
+    print(json.dumps({
+        "status": "ok",
+        "action": "created" if is_new else "updated",
+        "file": f"{module}/{name}.md",
+        "module": module,
+        "path": str(filepath),
+    }, ensure_ascii=False))
+
+
 # ── CLI 入口 ──────────────────────────────────────────────
 
 def main():
@@ -357,6 +380,13 @@ def main():
     p_create.add_argument("--module", required=True, help="模块名称")
     p_create.add_argument("--name", required=True, help="文档名称（不含扩展名）")
     p_create.add_argument("--title", default=None, help="文档一级标题（默认使用 name）")
+
+    p_update = sub.add_parser("update", help="创建或更新模块文档（含内容）")
+    p_update.add_argument("--root", required=True, help="项目根目录路径")
+    p_update.add_argument("--module", required=True, help="模块名称")
+    p_update.add_argument("--name", required=True, help="文档名称（不含扩展名）")
+    p_update.add_argument("--content", required=True, help="文档正文内容（Markdown）")
+    p_update.add_argument("--title", default=None, help="文档一级标题（默认使用 name）")
 
     p_progress = sub.add_parser("progress", help="记录会话进度")
     p_progress.add_argument("--root", required=True)
@@ -385,6 +415,8 @@ def main():
 
     if args.command == "create":
         cmd_create(args.root, args.module, args.name, getattr(args, "title", None))
+    elif args.command == "update":
+        cmd_update(args.root, args.module, args.name, args.content, getattr(args, "title", None))
     elif args.command == "progress":
         cmd_progress(args.root, args.topic, args.record_type, args.summary,
                      session_id=getattr(args, "session_id", None),

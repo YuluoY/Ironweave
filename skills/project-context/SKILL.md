@@ -120,6 +120,41 @@ graph TB
 - 文件已被删除 → 标记为 deleted
 - 文件内容已变但摘要未更新 → 标记为 stale
 
+### 5. deps — 依赖关系扫描
+
+扫描所有源码文件，提取 import/require 静态依赖，写入 `dependencies` 表：
+
+- TypeScript/JavaScript：ES import、CJS require、dynamic import、re-export
+- Python：import / from...import（优先使用 `ast` 模块，语法错误降级为正则）
+- Java：import 语句
+- 仅记录项目内文件间的依赖（外部包跳过）
+
+> 实现见 → `scripts/dep_extractor.py`
+
+### 6. stale-check — 抽样新鲜度检测
+
+快速判断 db 是否需要执行 sync：
+
+- 从 `file_tree` 中随机抽样 20 个 active 文件
+- 对比 mtime 是否变化
+- 如果 >20% 文件过期 → 返回 `recommendation: "sync"`
+- agent 在上下文感知阶段首先执行 stale-check，如需 sync 则先 sync 再继续
+
+### 7. 知识提取（Deliver 阶段）
+
+在每次 Deliver 完成后，AI agent 负责提取本次任务中发现的语义级知识：
+
+**knowledge_edges（关系图）**：
+- 回顾本次任务中涉及的文件和符号
+- 提取调用关系（calls）、继承（extends）、事件触发（triggers）、数据读写（reads/writes）等
+- 用 INSERT OR REPLACE 写入 `knowledge_edges` 表
+- confidence 规则：任务完成且用户未质疑 → `validated`；推理得出 → `inferred`
+
+**knowledge_flows（业务流）**：
+- 如果本次任务涉及跨模块业务流程（如用户注册、订单创建）
+- 提取完整步骤链（file → symbol → action）
+- 写入 `knowledge_flows` 表
+
 ## 数据库 Schema 概要
 
 | 表名 | 用途 |
@@ -127,6 +162,9 @@ graph TB
 | `project_meta` | 项目元信息（名称、根路径、monorepo 结构、Node 版本等） |
 | `file_tree` | 文件树快照（路径、类型、大小、mtime、hash、状态、分类） |
 | `code_summary` | 代码结构摘要（文件→导出的函数/类/接口签名） |
+| `dependencies` | 文件间静态依赖（import/require 关系，由脚本自动提取） |
+| `knowledge_edges` | 语义级关系图（函数调用、继承、事件触发等，由 AI 在 Deliver 阶段提取） |
+| `knowledge_flows` | 业务流链路（跨模块业务流程步骤，由 AI 在 Deliver 阶段提取） |
 
 > 完整 Schema（含字段定义与索引）见 → `references/schema.md`
 
@@ -137,13 +175,16 @@ graph TB
 ## Python 脚本
 
 ```bash
-python scripts/context_db.py init     --root <project_root>
-python scripts/context_db.py sync     --root <project_root>
-python scripts/context_db.py query    --root <project_root> --scope structure|meta [--module <path>] [--keyword <term>]
-python scripts/context_db.py validate --root <project_root>
+python scripts/context_db.py init        --root <project_root>
+python scripts/context_db.py sync        --root <project_root>
+python scripts/context_db.py deps        --root <project_root>
+python scripts/context_db.py stale-check --root <project_root> [--sample <n>]
+python scripts/context_db.py knowledge   --root <project_root> --type edges|flows --data <JSON> [--session <hash>]
+python scripts/context_db.py query       --root <project_root> --scope structure|meta [--module <path>] [--keyword <term>]
+python scripts/context_db.py validate    --root <project_root>
 ```
 
-> 脚本实现见 → `scripts/context_db.py`
+> 脚本实现见 → `scripts/context_db.py`、`scripts/dep_extractor.py`
 
 ## 常见问题
 

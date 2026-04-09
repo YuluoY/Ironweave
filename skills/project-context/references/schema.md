@@ -77,6 +77,115 @@ CREATE INDEX IF NOT EXISTS idx_code_summary_symbol ON code_summary(symbol);
 CREATE INDEX IF NOT EXISTS idx_code_summary_kind ON code_summary(kind);
 ```
 
+## dependencies — 文件间依赖关系
+
+记录文件间的 import/require 静态依赖，由 `scripts/dep_extractor.py` 在 sync 时自动解析填充。
+
+```sql
+CREATE TABLE IF NOT EXISTS dependencies (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_path TEXT NOT NULL,          -- 发起 import 的文件（项目相对路径）
+    target_path TEXT NOT NULL,          -- 被 import 的文件（项目相对路径）
+    import_type TEXT NOT NULL,          -- import / require / dynamic_import / re_export
+    symbols     TEXT,                   -- 导入的具体符号（JSON 数组，如 ["UserService", "AuthGuard"]）
+    is_type_only INTEGER DEFAULT 0,    -- TypeScript 仅类型导入（1=type-only, 0=value）
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (source_path) REFERENCES file_tree(path) ON DELETE CASCADE,
+    FOREIGN KEY (target_path) REFERENCES file_tree(path) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_dep_source ON dependencies(source_path);
+CREATE INDEX IF NOT EXISTS idx_dep_target ON dependencies(target_path);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_dep_pair ON dependencies(source_path, target_path);
+```
+
+### import_type 取值规则
+
+| import_type | 匹配模式 |
+|-------------|---------|
+| `import` | ES `import { X } from '...'` / Python `from ... import X` / Java `import ...` |
+| `require` | CJS `require('...')` |
+| `dynamic_import` | `import('...')` / `__import__('...')` |
+| `re_export` | `export { X } from '...'` / `export * from '...'` |
+
+## knowledge_edges — 语义级关系图
+
+记录 agent 在任务执行过程中发现的符号级语义关系。**由 AI agent 在 Deliver 阶段提取**，非脚本生成。
+
+```sql
+CREATE TABLE IF NOT EXISTS knowledge_edges (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_file   TEXT NOT NULL,        -- 源文件路径
+    source_symbol TEXT,                 -- 源符号（函数名/类名，NULL 表示文件级）
+    target_file   TEXT NOT NULL,        -- 目标文件路径
+    target_symbol TEXT,                 -- 目标符号
+    relation      TEXT NOT NULL,        -- 关系类型（见下表）
+    context       TEXT,                 -- 一句话描述关系语境
+                                       -- 如 "注册前先校验手机号唯一性"
+    confidence    TEXT DEFAULT 'validated',  -- validated / inferred
+    session_hash  TEXT,                 -- 产生此知识的会话标识
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (source_file) REFERENCES file_tree(path) ON DELETE CASCADE,
+    FOREIGN KEY (target_file) REFERENCES file_tree(path) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_ke_source ON knowledge_edges(source_file);
+CREATE INDEX IF NOT EXISTS idx_ke_target ON knowledge_edges(target_file);
+CREATE INDEX IF NOT EXISTS idx_ke_relation ON knowledge_edges(relation);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ke_unique ON knowledge_edges(
+    source_file, COALESCE(source_symbol, ''), target_file, COALESCE(target_symbol, ''), relation
+);
+```
+
+### relation 取值规则
+
+| relation | 含义 | 示例 |
+|----------|------|------|
+| `calls` | 函数/方法调用 | `UserService.register()` calls `AuthService.validate()` |
+| `extends` | 继承 | `AdminUser` extends `BaseUser` |
+| `implements` | 接口实现 | `UserServiceImpl` implements `IUserService` |
+| `triggers` | 事件触发 | `OrderService.create()` triggers `InventoryEvent` |
+| `reads` | 数据读取 | `ReportService` reads `analytics_table` |
+| `writes` | 数据写入 | `UserService.register()` writes `user_table` |
+| `validates` | 校验依赖 | `CreateUserDTO` validates via `PhoneValidator` |
+| `delegates` | 委托/代理 | `Controller` delegates to `Service` |
+
+### confidence 含义
+
+| 值 | 含义 |
+|----|------|
+| `validated` | 任务完成且用户**未质疑**结果——隐式确认关系有效 |
+| `inferred` | agent 推理得出但未经实际执行验证 |
+
+## knowledge_flows — 业务流链路
+
+记录 agent 发现的跨模块业务流程链路。**由 AI agent 在 Deliver 阶段提取**。
+
+```sql
+CREATE TABLE IF NOT EXISTS knowledge_flows (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    flow_name    TEXT NOT NULL,         -- 流程名（如 "用户注册流程"）
+    steps        TEXT NOT NULL,         -- JSON 数组：[{"file":"...","symbol":"...","action":"..."}]
+    description  TEXT,                  -- 自然语言描述
+    confidence   TEXT DEFAULT 'validated',
+    session_hash TEXT,
+    updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_kf_name ON knowledge_flows(flow_name);
+```
+
+### steps JSON 格式
+
+```json
+[
+  {"file": "src/auth/auth.controller.ts", "symbol": "login", "action": "接收登录请求"},
+  {"file": "src/auth/auth.service.ts", "symbol": "validateCredentials", "action": "校验凭证"},
+  {"file": "src/auth/token.service.ts", "symbol": "generateTokenPair", "action": "生成双 Token"},
+  {"file": "src/cache/redis.service.ts", "symbol": "setRefreshToken", "action": "存储刷新令牌"}
+]
+```
+
 ## FTS5 全文检索（可选启用）
 
 ```sql

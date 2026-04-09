@@ -1,14 +1,15 @@
 # Deliver 阶段
 
-Validate 卡点通过后进入 Deliver。此阶段包含**三个强制步骤**，任何路径都不可跳过。**每个 Slice 的 Deliver 都执行完整同步**——不仅是最终 Slice，中间 Slice 也必须同步，确保产出可持久化、可跨会话恢复。
+Validate 卡点通过后进入 Deliver。此阶段包含**三个强制步骤**，任何路径都不可跳过。**每个 Slice 的 Deliver 都执行完整同步**——不仅是最终 Slice，中间 Slice 也必须同步，确保产出可持久化、可跨会话恢复。project-context 回写现已包含**知识提取**（依赖扫描 + 语义关系 + 业务流链路）。
 
 ```mermaid
 graph TB
     DELIVER_IN["Validate 卡点通过"] --> PARALLEL["SubAgent 并行"]
     PARALLEL --> DOCS_FINAL["docs-output<br>文档同步"]
     PARALLEL --> CTX_SYNC["project-context<br>项目状态回写"]
+    CTX_SYNC --> KNOW["knowledge extraction<br>依赖扫描 + 语义关系 + 业务流"]
     DOCS_FINAL --> JOIN["汇合"]
-    CTX_SYNC --> JOIN
+    KNOW --> JOIN
     JOIN --> RECONCILE["Reconcile 对账<br>机械对比 · 补漏"]
     RECONCILE --> SLICE_CHK{"多 Slice 模式?"}
     SLICE_CHK -->|"是"| SLICE_SUM["输出 Slice 交付摘要<br>+ 更新 Slice 进度"]
@@ -24,6 +25,7 @@ graph TB
     style PARALLEL fill:#fff3e0,stroke:#e65100,color:#bf360c
     style DOCS_FINAL fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
     style CTX_SYNC fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    style KNOW fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
     style JOIN fill:#fff3e0,stroke:#e65100,color:#bf360c
     style RECONCILE fill:#fff9c4,stroke:#f9a825,color:#e65100,stroke-width:2px
     style SLICE_SUM fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
@@ -31,20 +33,86 @@ graph TB
     style DONE fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20,stroke-width:2px
     style PAUSE fill:#fff3e0,stroke:#e65100,color:#bf360c,stroke-width:2px
     style SAVE fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    style SLICE_CHK fill:#ffffff,stroke:#424242,color:#212121
+    style NEXT fill:#ffffff,stroke:#424242,color:#212121
+    style LOOP fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
 ```
 
 ## docs-output（强制）
 
-- 将本次 Slice 迭代产出的所有文档同步到 docs/ 目录
-- 包括：需求文档、设计文档、API 契约、测试方案等
-- A 系列首个 Slice 在 Plan 阶段已初始化，此处做终态更新
-- 后续 Slice / B/C/D 系列做增量同步
+逐条执行，不可省略：
+
+### D1. 模块文档更新
+
+对本次涉及的**每个业务模块**，调用命令写入/更新详细文档：
+
+```bash
+python scripts/docs_manager.py update \
+  --root <project_root> \
+  --module <模块名> \
+  --name <文档名> \
+  --content "<本模块本次迭代的详细描述（Markdown）>" \
+  --title "<文档标题>"
+```
+
+- **内容要求**：不是空壳，包含功能描述、接口定义、关键逻辑、技术决策
+- **覆盖范围**：本次 Slice 涉及的所有模块，每个模块至少一个文档
+- 如果文档已存在，update 会覆盖——确保内容反映最新实现
+
+### D2. 进度记录
+
+```bash
+python scripts/docs_manager.py progress \
+  --root <project_root> \
+  --topic "<主题>" \
+  --type "<需求开发|Bug修复|技术方案|重构|其他>" \
+  --summary "<一句话摘要>" \
+  --files '[{"path":"<变更文件>","reason":"<变更原因>"}]' \
+  --decisions "<技术决策（如有）>" \
+  --todos "<遗留问题（如有）>"
+```
+
+- 首次调用返回 `session_id`，同会话后续调用传 `--session-id` 追加
 
 ## project-context（强制）
 
-- 将本次 Slice 迭代的关键信息回写到项目上下文
-- 包括：新增模块、变更的文件、新的技术决策、已知问题
-- 确保下次对话或下个 Slice 能正确感知当前项目状态
+逐条执行，不可省略：
+
+### D3. 文件树同步
+
+```bash
+python scripts/context_db.py sync --root <project_root>
+```
+
+### D4. 依赖扫描
+
+```bash
+python scripts/context_db.py deps --root <project_root>
+```
+
+### D5. 知识提取
+
+根据本次任务涉及的文件和符号，提取语义关系：
+
+```bash
+python scripts/context_db.py knowledge \
+  --root <project_root> \
+  --type edges \
+  --data '[{"source_file":"<源文件>","source_symbol":"<函数/类名>","target_file":"<目标文件>","target_symbol":"<目标符号>","relation":"<calls|extends|implements|triggers|reads|writes|validates|delegates>","context":"<一句话描述>"}]'
+```
+
+如本次任务涉及跨模块业务流程：
+
+```bash
+python scripts/context_db.py knowledge \
+  --root <project_root> \
+  --type flows \
+  --data '[{"flow_name":"<流程名>","steps":[{"file":"<文件>","symbol":"<符号>","action":"<动作描述>"}],"description":"<流程描述>"}]'
+```
+
+- **判断规则**：回顾本次实际触碰的文件，如果 A 文件的函数调用了 B 文件的函数 → 必须记录
+- **最少记录**：本次涉及 ≥2 个文件间交互时，至少产出 1 条 edge
+- **不确定的关系**：confidence 设为 `inferred`
 
 ## Reconcile 对账（强制）
 

@@ -127,7 +127,14 @@ Creates a new document in the specified module directory.
 - Auto-creates module directory (if it doesn't exist)
 - Generates blank document (containing only the top-level heading)
 
-### 2. progress — Record Progress
+### 2. update — Create or Update Module Document (with content)
+
+Creates or overwrites a module document with content provided via parameter. Mandatory during Deliver stage.
+
+- Creates if not exists, overwrites if exists
+- `--content` parameter receives full Markdown body (including feature descriptions, interface definitions, technical decisions, etc.)
+
+### 3. progress — Record Progress
 
 Creates or appends a session progress record.
 
@@ -135,15 +142,15 @@ Creates or appends a session progress record.
 - With `--session-id`: appends entry to existing file, each entry timestamped `[HH:mm:ss]` to the second
 - Returns `session_id` for reuse in subsequent calls
 
-### 3. list — List Documents
+### 4. list — List Documents
 
 Lists all content under docs/ by module and progress separately.
 
-### 4. validate — Validate Directory
+### 5. validate — Validate Directory
 
 Checks basic health of the document directory.
 
-### 5. archive — Archive Old Progress
+### 6. archive — Archive Old Progress
 
 Moves progress records older than 30 days to `progress/archive/YYYY-MM/`.
 
@@ -158,6 +165,7 @@ Moves progress records older than 30 days to `progress/archive/YYYY-MM/`.
 
 ```bash
 python scripts/docs_manager.py create   --root <project_root> --module <module_name> --name <doc_name> [--title <heading>]
+python scripts/docs_manager.py update   --root <project_root> --module <module_name> --name <doc_name> --content <content> [--title <heading>]
 python scripts/docs_manager.py progress --root <project_root> --topic <topic> --type <type> --summary <summary> [--session-id <session_id>] [--files <changed_files_JSON>] [--decisions <decisions>] [--todos <remaining>]
 python scripts/docs_manager.py list     --root <project_root>
 python scripts/docs_manager.py validate --root <project_root>
