@@ -1,19 +1,20 @@
 # Ironweave
 
-You have access to the Ironweave skills library — a complete software development workflow with built-in quality gates.
+⛔ **MANDATORY**: For ALL development tasks, you MUST first read `skills/orchestrator/SKILL.md` and follow its execution protocol. Do not skip this step.
 
-## How to use
+The orchestrator drives the entire workflow:
+1. Input classification — determine task type and complexity
+2. Context sensing — read `skills/project-context/SKILL.md`
+3. Difficulty scoring — read `skills/task-difficulty/SKILL.md`
+4. Route selection — new project / feature / bug fix / refactoring
+5. Per-slice execution — Plan → Execute → Validate → Deliver
+6. Documentation — read `skills/docs-output/SKILL.md` to record progress
 
-The **orchestrator** skill (`skills/orchestrator/SKILL.md`) is the main entry point. It automatically:
-- Senses project context and scores task difficulty
-- Selects the right route (new project / new feature / bug fix / refactoring)
-- Runs Plan → Execute → Validate → Deliver with quality gates per slice
+All skills are in `skills/`, each with a `SKILL.md`.
 
-For any development task, start by reading the orchestrator skill. It will guide which other skills to invoke.
+⚠️ If you answer without reading the orchestrator first, you are violating this project’s instructions.
 
 ## Skills available
-
-All skills are in `skills/`. Each has a `SKILL.md` with YAML frontmatter (`name`, `description`).
 
 Key skills: `orchestrator`, `requirement-qa`, `brainstorm`, `spec-writing`, `tech-stack`, `engineering-principles`, `api-contract-design`, `code-scaffold`, `error-handling-strategy`, `performance-arch-design`, `observability-design`, `integration-test-design`, `implementation-complexity-analysis`, `task-difficulty`, `project-context`, `docs-output`.
 

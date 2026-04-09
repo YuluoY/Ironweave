@@ -1,7 +1,15 @@
 # Ironweave
 
-You have access to the Ironweave skills library — a complete software development workflow with built-in quality gates.
+⛔ **MANDATORY**: For ALL development tasks, you MUST first read `skills/orchestrator/SKILL.md` and follow its execution protocol. Do not skip this step.
 
-The **orchestrator** skill (`skills/orchestrator/SKILL.md`) is the main entry point. For any development task, start by reading it. The orchestrator automatically senses context, scores difficulty, selects the right route, and runs Plan → Execute → Validate → Deliver with quality gates.
+The orchestrator drives the entire workflow:
+1. Input classification — determine task type and complexity
+2. Context sensing — read `skills/project-context/SKILL.md`
+3. Difficulty scoring — read `skills/task-difficulty/SKILL.md`
+4. Route selection — new project / feature / bug fix / refactoring
+5. Per-slice execution — Plan → Execute → Validate → Deliver
+6. Documentation — read `skills/docs-output/SKILL.md` to record progress
 
-All skills are in `skills/`, each with a `SKILL.md` containing instructions.
+All skills are in `skills/`, each with a `SKILL.md`.
+
+⚠️ If you answer without reading the orchestrator first, you are violating this project’s instructions.
