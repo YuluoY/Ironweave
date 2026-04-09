@@ -1,6 +1,6 @@
 {
   "name": "ironweave",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Agentic skills framework for AI coding agents — orchestrated workflows with adaptive routing, quality gates, and 17 composable skills.",
   "keywords": [
     "agent-skills",
@@ -17,13 +17,13 @@
     "quality-gates",
     "skills-sh"
   ],
-  "homepage": "https://github.com/YuluoY/ironware",
+  "homepage": "https://github.com/YuluoY/ironweave",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YuluoY/ironware.git"
+    "url": "https://github.com/YuluoY/ironweave.git"
   },
   "bugs": {
-    "url": "https://github.com/YuluoY/ironware/issues"
+    "url": "https://github.com/YuluoY/ironweave/issues"
   },
   "license": "MIT",
   "author": "YuluoY",

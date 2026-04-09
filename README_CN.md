@@ -130,21 +130,21 @@ npx ironweave@latest list
 
 ```bash
 # 安装到指定编辑器（推荐）
-npx skills add YuluoY/ironware --skill '*' -a cursor -y
-npx skills add YuluoY/ironware --skill '*' -a trae -y
-npx skills add YuluoY/ironware --skill '*' -a claude-code -y
+npx skills add YuluoY/ironweave --skill '*' -a cursor -y
+npx skills add YuluoY/ironweave --skill '*' -a trae -y
+npx skills add YuluoY/ironweave --skill '*' -a claude-code -y
 
 # 安装到多个编辑器
-npx skills add YuluoY/ironware --skill '*' -a cursor -a windsurf -y
+npx skills add YuluoY/ironweave --skill '*' -a cursor -a windsurf -y
 
 # 安装到所有编辑器（会生成很多 agent 目录）
-npx skills add YuluoY/ironware --all
+npx skills add YuluoY/ironweave --all
 
 # 交互式选择技能和编辑器
-npx skills add YuluoY/ironware
+npx skills add YuluoY/ironweave
 
 # 列出可用技能
-npx skills add YuluoY/ironware --list
+npx skills add YuluoY/ironweave --list
 ```
 
 skills.sh 的 Agent 名称：`claude-code`、`github-copilot`、`cursor`、`windsurf`、`cline`、`trae`、`codebuddy`、`codex`、`gemini-cli`。
@@ -159,7 +159,7 @@ skills.sh 的 Agent 名称：`claude-code`、`github-copilot`、`cursor`、`wind
 Ironweave 自带项目根目录的 `CLAUDE.md` — Claude Code 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -170,7 +170,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 已预配置 `.github/copilot-instructions.md`。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -181,7 +181,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带 `.cursor/rules/ironweave.mdc`（`alwaysApply: true`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -192,7 +192,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带 `.windsurf/rules/ironweave.md`（`trigger: always_on`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -203,7 +203,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带 `.clinerules/ironweave.md`，可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -214,7 +214,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带 `.trae/rules/ironweave.md`，可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -225,7 +225,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带 `.codebuddy/rules/ironweave/RULE.mdc`（`alwaysApply: true`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -236,7 +236,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带项目根目录的 `AGENTS.md` — Codex 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -247,7 +247,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave 自带项目根目录的 `GEMINI.md` — Gemini CLI 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>

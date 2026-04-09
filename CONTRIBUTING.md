@@ -12,7 +12,7 @@ Thank you for your interest in contributing! Ironweave welcomes contributions fr
 ## Development Setup
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 cd ironweave
 ```
 

@@ -132,21 +132,21 @@ Available agents: `claude`, `copilot`, `cursor`, `windsurf`, `cline`, `trae`, `c
 
 ```bash
 # Install to a specific editor (recommended)
-npx skills add YuluoY/ironware --skill '*' -a cursor -y
-npx skills add YuluoY/ironware --skill '*' -a trae -y
-npx skills add YuluoY/ironware --skill '*' -a claude-code -y
+npx skills add YuluoY/ironweave --skill '*' -a cursor -y
+npx skills add YuluoY/ironweave --skill '*' -a trae -y
+npx skills add YuluoY/ironweave --skill '*' -a claude-code -y
 
 # Install to multiple editors
-npx skills add YuluoY/ironware --skill '*' -a cursor -a windsurf -y
+npx skills add YuluoY/ironweave --skill '*' -a cursor -a windsurf -y
 
 # Install to ALL editors (installs many agent directories)
-npx skills add YuluoY/ironware --all
+npx skills add YuluoY/ironweave --all
 
 # Interactive: select skills and editors
-npx skills add YuluoY/ironware
+npx skills add YuluoY/ironweave
 
 # List available skills
-npx skills add YuluoY/ironware --list
+npx skills add YuluoY/ironweave --list
 ```
 
 Agent names for skills.sh: `claude-code`, `github-copilot`, `cursor`, `windsurf`, `cline`, `trae`, `codebuddy`, `codex`, `gemini-cli`.
@@ -161,7 +161,7 @@ Agent names for skills.sh: `claude-code`, `github-copilot`, `cursor`, `windsurf`
 Ironweave ships with `CLAUDE.md` at the project root — Claude Code reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -172,7 +172,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.github/copilot-instructions.md` pre-configured.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -183,7 +183,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.cursor/rules/ironweave.mdc` (`alwaysApply: true`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -194,7 +194,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.windsurf/rules/ironweave.md` (`trigger: always_on`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -205,7 +205,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.clinerules/ironweave.md` for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -216,7 +216,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.trae/rules/ironweave.md` for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -227,7 +227,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `.codebuddy/rules/ironweave/RULE.mdc` (`alwaysApply: true`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -238,7 +238,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `AGENTS.md` at the project root — Codex reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
@@ -249,7 +249,7 @@ git clone https://github.com/YuluoY/ironware.git
 Ironweave ships with `GEMINI.md` at the project root — Gemini CLI reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironware.git
+git clone https://github.com/YuluoY/ironweave.git
 ```
 
 </details>
