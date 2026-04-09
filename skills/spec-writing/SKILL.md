@@ -1,7 +1,7 @@
 ---
 name: spec-writing
 description: >-
-  撰写和修订模块化需求功能文档，输出到 specs/ 目录。每篇功能文档包含六段结构：功能概述、用户故事、需求描述、技术要求、约束条件、测试标准。所有结构图一律使用 Mermaid（flowchart、sequenceDiagram、erDiagram 等）。Monorepo 默认 apps/ + packages/ 布局。
+  撰写和修订模块化需求功能文档，输出到 specs/ 目录。每篇功能文档包含六段结构：功能概述、用户故事、需求描述、技术要求、约束条件、测试标准。所有结构图（逻辑、模块、流程、时序、架构、ER）严格使用 Mermaid 代码，目录树使用纯文本树格式。Monorepo 默认 apps/ + packages/ 布局。
   务必在以下场景使用本 skill：用户提到需求文档、PRD、产品需求、功能文档、specs、用户故事、user stories、验收标准、acceptance criteria、feature requirements、需求分析、业务需求、功能需求、需求规格、需求评审、需求变更、功能点拆分，或者用户要求撰写 / 修订 / 评审某个功能的详细描述，即使没有明确说“需求文档”。不适用于纯技术选型文档。
 ---
 
@@ -17,11 +17,18 @@ description: >-
 - **结构化**：每个功能文档必须包含下列 **六个部分**，缺一不可。六段结构确保从"做什么"到"怎么验收"形成闭环，避免遗漏。
 - **Monorepo 语境**：若需求涉及仓库布局，默认约定为 **`apps/`** 业务应用、**`packages/`** 可复用包；与项目实际不符时以用户/仓库说明为准。
 
-## 图表（唯一绘图语言：Mermaid）
+## 图表绘制策略
 
-需求文档中凡需**可视化**，**一律使用 Mermaid**。Mermaid 是纯文本，可 Git 管理、可 diff、可 PR review。
+| 场景 | 工具 | 说明 |
+|------|------|------|
+| 逻辑/流程图（分支、回流、状态） | Mermaid `flowchart` | 强制定义每条路径，消除歧义 |
+| 模块/架构图（依赖、分层） | Mermaid `graph TD/LR` | 结构关系可视化 |
+| 时序图（API 调用、消息流） | Mermaid `sequenceDiagram` | 多角色交互天然匹配 |
+| 实体关系图（数据库、领域模型） | Mermaid `erDiagram` | 实体 + 关系 + 属性 |
+| 状态机 | Mermaid `stateDiagram-v2` | 状态转移天然匹配 |
+| **目录树 / 文件结构** | **纯文本树**（`├── └──`） | 层级结构紧凑直观，模型天然理解 |
 
-常用类型：`graph TD/LR`（模块/架构图）、`flowchart`（流程/状态）、`sequenceDiagram`（时序）、`erDiagram`（实体关系）。图内嵌于 ` ```mermaid ` 代码块中。
+**规则**：逻辑、模块、流程、时序、架构、ER 等结构图**严格使用 Mermaid 代码**。目录树/文件结构使用纯文本树格式。Mermaid 是纯文本，可 Git 管理、可 diff、可 PR review。
 
 > **何时该画图**：≥2 角色交互→时序图；≥3 步分支→流程图；新增/变更实体→ER 图；模块依赖→模块图。
 >

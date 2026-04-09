@@ -1,8 +1,8 @@
 ---
 name: error-handling-strategy
 description: >-
-  错误处理与容错设计——从边界场景出发，设计统一异常体系、错误码规范、重试策略、熔断降级和全局错误拦截方案。将 steps/11 边界设计中的异常场景转化为可实现的错误处理架构。
-  务必在以下场景使用本 skill：用户提到异常处理、错误处理、错误码、异常分级、重试策略、熔断、降级、容错、全局异常处理、error handling、circuit breaker、retry、fallback、graceful degradation、隔舱模式、超时策略、防御式编程，或涉及 steps/11 边界设计中的异常体系和容错逻辑。
+  错误处理与容错设计——从边界场景出发，设计统一异常体系、错误码规范、重试策略、熔断降级和全局错误拦截方案。将 spec-writing 的异常场景和 api-contract-design 的边界条件转化为可实现的错误处理架构。产出输出到 specs/{module}/error-handling.md（按业务模块分目录）。
+  务必在以下场景使用本 skill：用户提到异常处理、错误处理、错误码、异常分级、重试策略、熔断、降级、容错、全局异常处理、error handling、circuit breaker、retry、fallback、graceful degradation、隔舱模式、超时策略、防御式编程，或涉及 spec-writing 产出的异常场景和 api-contract-design 产出的边界条件中的容错逻辑。
 ---
 
 # 错误处理与容错设计

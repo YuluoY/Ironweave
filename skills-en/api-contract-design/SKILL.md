@@ -1,7 +1,7 @@
 ---
 name: api-contract-design
 description: >-
-  A detailed design tool for API interface contracts and type systems. Starting from domain models and requirement documents, it generates RESTful/GraphQL API endpoint definitions, Request/Response DTO structures, error response standards, OpenAPI specifications, and type code scaffolds.
+  A detailed design tool for API interface contracts and type systems. Starting from domain models and requirement documents, it generates RESTful/GraphQL API endpoint definitions, Request/Response DTO structures, error response standards, OpenAPI specifications, and type code scaffolds. Output to specs/{module}/api-contract.md (organized by business module).
   Use this skill in the following scenarios: when users need to design API interfaces, define Data Transfer Objects (DTOs), write interface documentation, establish error code standards, or when users say "design API", "define API", "write API contract", "DTO design", "API specification", "error codes", "OpenAPI", "Swagger".
   Use this skill when the user's task involves transforming business models into technical interfaces.
 ---

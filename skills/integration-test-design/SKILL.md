@@ -2,7 +2,7 @@
 name: integration-test-design
 description: >-
   集成测试方案设计——从时序设计和边界场景出发，生成模块间集成测试策略、测试环境配置和测试用例骨架。覆盖 TestContainers、Mock vs 真实依赖的权衡、契约测试、API 测试等。
-  务必在以下场景使用本 skill：用户提到集成测试、integration test、TestContainers、API 测试、契约测试、contract test、E2E 测试、模块间测试、Mock 数据库、测试环境、测试隔离、测试策略、端到端测试、回归测试、接口联调测试，或者涉及 steps/09 时序设计和 steps/11 边界设计中多模块交互的测试验证。
+  务必在以下场景使用本 skill：用户提到集成测试、integration test、TestContainers、API 测试、契约测试、contract test、E2E 测试、模块间测试、Mock 数据库、测试环境、测试隔离、测试策略、端到端测试、回归测试、接口联调测试，或者涉及 spec-writing 的交互流描述和 api-contract-design 的边界条件中多模块交互的测试验证。
 ---
 
 # 集成测试方案设计

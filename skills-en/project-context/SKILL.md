@@ -1,7 +1,7 @@
 ---
 name: project-context
 description: >-
-  Infrastructure skill — maintains project file tree snapshots and code structure summaries in a SQLite database (.cache/context.db) at the project root, solving the problem of models forgetting project structure across sessions. Mandatory invocation by orchestrator during context awareness stage (before route selection) and Deliver stage; must not be skipped. Only reads project source code (primary data), never modifies files.
+  Infrastructure skill — maintains project file tree snapshots and code structure summaries in a SQLite database (.cache/context.db) at the project root, solving the problem of models forgetting project structure across sessions. Mandatory invocation by orchestrator during context awareness stage (before route selection) and Deliver stage; must not be skipped. Scans all project files (source, config, docs, tests, assets), never modifies files.
   Use this skill when: understanding overall project structure, querying a module's file list and exported symbols, restoring project structure understanding across sessions, project awareness, context sync, project memory, code summary indexing, viewing project structure. This skill does not modify source code or manage document outputs.
 ---
 
@@ -9,7 +9,9 @@ description: >-
 
 This Skill solves a core problem: **AI models lose understanding of project structure across sessions**. Every new session requires re-scanning directories, re-understanding code organization — inefficient and prone to omissions.
 
-This Skill maintains a **SQLite database** (`.ai/context.db`) in the project to persist file tree and code structure summaries, enabling rapid cross-session project cognition recovery.
+This Skill maintains a **SQLite database** (`.cache/context.db`) in the project to persist file tree and code structure summaries, enabling rapid cross-session project cognition recovery.
+
+> **Applies to new projects**: Even when no source code exists yet (Route A new project during Plan phase), `init` should still be executed to create the db and record existing structure (config files, document outputs, etc.). The `file_tree` tracks all files by category (source/config/doc/test/asset/other), not just source code. Documents produced by Plan-phase skills (docs/, specs/) are captured by `sync`.
 
 ## Data Model
 

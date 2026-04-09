@@ -2,7 +2,7 @@
 name: code-scaffold
 description: >-
   从设计文档生成项目代码骨架——包括目录结构、分层架构、Entity/Repository/Service 骨架、配置文件和测试框架初始化。执行阶段的核心工具，将 Plan 阶段产出的领域模型、时序设计、组件设计转化为可编译运行的项目框架。
-  务必在以下场景使用本 skill：用户要求初始化项目、生成代码骨架、搭建项目结构、创建 Entity、创建 Repository、创建 Service、项目脚手架、scaffold、项目初始化、从设计到代码、组件结构生成、代码生成、模块注册，或涉及 steps/09 时序设计和 steps/10 组件设计到实际代码的转化工作。
+  务必在以下场景使用本 skill：用户要求初始化项目、生成代码骨架、搭建项目结构、创建 Entity、创建 Repository、创建 Service、项目脚手架、scaffold、项目初始化、从设计到代码、组件结构生成、代码生成、模块注册，或将 spec-writing 的交互流描述和 api-contract-design 的端点契约以及 engineering-principles 的架构模式转化为实际代码。
 ---
 
 # 代码骨架生成

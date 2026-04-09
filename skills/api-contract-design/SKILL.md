@@ -1,7 +1,7 @@
 ---
 name: api-contract-design
 description: >-
-  API 接口契约与类型系统的详细设计工具。从领域模型和需求文档出发，生成 RESTful/GraphQL API 端点定义、Request/Response DTO 结构、错误响应标准、OpenAPI 规范以及类型代码骨架。
+  API 接口契约与类型系统的详细设计工具。从领域模型和需求文档出发，生成 RESTful/GraphQL API 端点定义、Request/Response DTO 结构、错误响应标准、OpenAPI 规范以及类型代码骨架。产出输出到 specs/{module}/api-contract.md（按业务模块分目录）。
   务必在以下场景使用本 skill：用户需要设计 API 接口、定义数据传输对象(DTO)、编写接口文档、制定错误码规范，或者用户说"设计接口"、"定义 API"、"写接口契约"、"DTO 设计"、"接口规范"、"错误码"、"OpenAPI"、"Swagger"。
   当用户的任务涉及从业务模型到技术接口的转化时使用本 skill。
 ---

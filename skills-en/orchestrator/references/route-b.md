@@ -1,5 +1,9 @@
 # B: New Feature for Existing Project
 
+⛔ **Path Lock**: The Mermaid flowcharts in this route are mandatory execution paths, not references. Every node must be executed in arrow order; conditional branches follow actual conditions. Do not skip any node or exit early. After completing each node, follow the arrow to the next.
+
+---
+
 ## Plan
 
 > **Note**: If the CLARIFY phase was already executed, requirement-qa in Plan switches to **slice mode** (only asking about current slice's functional details and impact scope, not repeating macro-level questions); brainstorm defaults to **skip** (CLARIFY already covered architecture discussion), unless new implementation approach disputes arise within the slice that trigger it.

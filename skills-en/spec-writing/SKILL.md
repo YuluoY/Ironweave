@@ -1,7 +1,7 @@
 ---
 name: spec-writing
 description: >-
-  Write and revise modular requirement/feature documents, output to the specs/ directory. Each feature document contains a six-section structure: Feature Overview, User Stories, Requirement Description, Technical Requirements, Constraints, and Test Criteria. All structural diagrams exclusively use Mermaid (flowchart, sequenceDiagram, erDiagram, etc.). Monorepo defaults to apps/ + packages/ layout.
+  Write and revise modular requirement/feature documents, output to the specs/ directory. Each feature document contains a six-section structure: Feature Overview, User Stories, Requirement Description, Technical Requirements, Constraints, and Test Criteria. All structural diagrams (logic, module, flow, sequence, architecture, ER) must use Mermaid code; directory trees use plain text tree format. Monorepo defaults to apps/ + packages/ layout.
   Use this skill when: the user mentions requirement documents, PRD, product requirements, feature documents, specs, user stories, acceptance criteria, feature requirements, requirement analysis, business requirements, functional requirements, requirement specifications, requirement review, requirement changes, feature decomposition, or asks to write/revise/review detailed feature descriptions, even without explicitly saying "requirement document". Not applicable for pure tech stack selection documents.
 ---
 
@@ -17,11 +17,18 @@ This Skill is responsible for **writing and revising requirement documents** —
 - **Structured**: Each feature document must contain the following **six sections**, no exceptions. The six-section structure ensures a closed loop from "what to do" to "how to verify", preventing omissions.
 - **Monorepo context**: When requirements involve repo layout, default to **`apps/`** for business apps and **`packages/`** for reusable packages; defer to user/repo instructions when they differ.
 
-## Diagrams (Only Drawing Language: Mermaid)
+## Diagram Strategy
 
-For any **visualization** in requirement documents, **use Mermaid exclusively**. Mermaid is plain text — Git-manageable, diffable, PR-reviewable.
+| Scenario | Tool | Notes |
+|----------|------|-------|
+| Logic/flowcharts (branches, loops, states) | Mermaid `flowchart` | Forces explicit path definitions, eliminates ambiguity |
+| Module/architecture diagrams (dependencies, layers) | Mermaid `graph TD/LR` | Structural relationship visualization |
+| Sequence diagrams (API calls, message flows) | Mermaid `sequenceDiagram` | Natural fit for multi-actor interactions |
+| Entity relationship diagrams (DB, domain models) | Mermaid `erDiagram` | Entities + relationships + attributes |
+| State machines | Mermaid `stateDiagram-v2` | Natural fit for state transitions |
+| **Directory trees / file structures** | **Plain text tree** (`├── └──`) | Compact, intuitive, models understand natively |
 
-Common types: `graph TD/LR` (module/architecture), `flowchart` (flow/state), `sequenceDiagram` (sequence), `erDiagram` (entity relationship). Embed in ` ```mermaid ` code blocks.
+**Rule**: Logic, module, flow, sequence, architecture, and ER diagrams **must use Mermaid code**. Directory trees/file structures use plain text tree format. Mermaid is plain text — Git-manageable, diffable, PR-reviewable.
 
 > **When to draw**: >= 2 actors interacting -> sequence diagram; >= 3 branching steps -> flowchart; new/changed entities -> ER diagram; module dependencies -> module diagram.
 >

@@ -2,7 +2,7 @@
 name: performance-arch-design
 description: >-
   Performance-first design — identifies performance bottlenecks at the architecture level before coding, and designs caching layers, async processing, database indexing, rate limiting, and partitioning strategies. Embeds performance thinking into the system architecture phase to avoid costly post-hoc optimization.
-  Use this skill when: the user mentions performance optimization, cache design, cache strategy, Redis, async processing, message queues, database indexes, index design, rate limiting, circuit breakers, sharding, partitioning, N+1 queries, slow queries, high concurrency, performance bottlenecks, QPS, TPS, response time, throughput, performance baselines, load testing targets, hot data, read-write separation, or involves performance-related decisions from steps/06 system architecture.
+  Use this skill when: the user mentions performance optimization, cache design, cache strategy, Redis, async processing, message queues, database indexes, index design, rate limiting, circuit breakers, sharding, partitioning, N+1 queries, slow queries, high concurrency, performance bottlenecks, QPS, TPS, response time, throughput, performance baselines, load testing targets, hot data, read-write separation, or involves performance-related decisions from engineering-principles and tech-stack architecture outputs.
 ---
 
 # Performance-First Design

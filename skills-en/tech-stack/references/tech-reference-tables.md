@@ -1,6 +1,6 @@
 # Reference Tech Tables
 
-The following tables are **for selection reference only**. When writing into the final document, each item must be annotated with "Adopted / Not adopted / TBD" with rationale.
+The following tables are **for selection reference only**. Each category has items marked "recommended" as default suggestions, but **recommended ≠ mandatory** — users can choose other technologies (including those not listed) based on their team's situation, just document the reasoning. When writing into the final document, each item must be annotated with "Adopted / Not adopted / TBD" with rationale.
 
 ---
 
@@ -67,7 +67,7 @@ The following tables are **for selection reference only**. When writing into the
 
 ---
 
-## Backend (Node.js Family, NestJS Recommended)
+## Backend (Node.js Family)
 
 | Category | Technology | Notes |
 |----------|-----------|-------|

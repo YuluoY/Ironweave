@@ -1,8 +1,8 @@
 ---
 name: error-handling-strategy
 description: >-
-  Error handling and resilience design — starting from boundary scenarios, design unified exception hierarchies, error code standards, retry strategies, circuit breakers, fallback degradation, and global error interception. Transforms exception scenarios from steps/11 boundary design into an implementable error handling architecture.
-  Use this skill when: the user mentions exception handling, error handling, error codes, exception classification, retry strategies, circuit breakers, degradation, fault tolerance, global exception handling, error handling, circuit breaker, retry, fallback, graceful degradation, bulkhead pattern, timeout strategies, defensive programming, or involves exception systems and fault tolerance logic from steps/11 boundary design.
+  Error handling and resilience design — starting from boundary scenarios, design unified exception hierarchies, error code standards, retry strategies, circuit breakers, fallback degradation, and global error interception. Transforms exception scenarios from spec-writing and boundary conditions from api-contract-design into an implementable error handling architecture. Output to specs/{module}/error-handling.md (organized by business module).
+  Use this skill when: the user mentions exception handling, error handling, error codes, exception classification, retry strategies, circuit breakers, degradation, fault tolerance, global exception handling, error handling, circuit breaker, retry, fallback, graceful degradation, bulkhead pattern, timeout strategies, defensive programming, or involves fault tolerance logic from spec-writing exception scenarios and api-contract-design boundary conditions.
 ---
 
 # Error Handling and Resilience Design

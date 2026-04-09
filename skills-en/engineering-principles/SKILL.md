@@ -1,7 +1,7 @@
 ---
 name: engineering-principles
 description: >-
-  Engineering principles matcher — based on current task and project context, filters applicable development principles and constraints from the principles library, outputting actionable guidance checklists. Does not force inapplicable principles (e.g., won't push TDD on legacy projects without test dependencies). Only outputs principles verified as applicable after context validation. Passively invoked, never auto-triggers.
+  Engineering principles matcher — based on current task and project context, filters applicable development principles and constraints from the principles library, outputting actionable guidance checklists to specs/engineering-principles.md. Does not force inapplicable principles (e.g., won't push TDD on legacy projects without test dependencies). Only outputs principles verified as applicable after context validation. Passively invoked, never auto-triggers.
   Use this skill when: coding standards, design principles, architecture guidance, code quality, maintainability, extensibility, TDD, DDD, SOLID, design patterns, engineering practices, code review, engineering principles, code quality, best practices, ddd, tdd, bdd, solid, clean code, refactoring suggestions.
 ---
 

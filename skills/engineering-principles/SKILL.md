@@ -1,7 +1,7 @@
 ---
 name: engineering-principles
 description: >-
-  工程原则匹配器——根据当前任务和项目上下文，从原则库中筛选出适用的开发原则和约束，输出可执行的指导清单。不强推不适用的原则（如无测试依赖的旧项目不推TDD），只输出经上下文验证后确实适用的原则。被动调用，不会主动触发。
+  工程原则匹配器——根据当前任务和项目上下文，从原则库中筛选出适用的开发原则和约束，输出可执行的指导清单到 specs/engineering-principles.md。不强推不适用的原则（如无测试依赖的旧项目不推TDD），只输出经上下文验证后确实适用的原则。被动调用，不会主动触发。
   务必在以下场景使用本 skill：编码规范、设计原则、架构指导、代码质量、可维护性、可扩展性、TDD、DDD、SOLID、设计模式、工程实践、代码审查、engineering principles、code quality、best practices、ddd、tdd、bdd、solid、clean code、重构建议。
 ---
 

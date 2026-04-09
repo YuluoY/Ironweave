@@ -2,7 +2,7 @@
 name: implementation-complexity-analysis
 description: >-
   Implementation complexity analysis — evaluates implementation difficulty of design proposals, identifies technical risk points, and provides algorithm selection, data structure trade-offs, and complex problem decomposition strategies. Upgrades task-difficulty's "is it hard?" to "what to do when it's complex", producing actionable technical breakthrough plans.
-  Use this skill when: the user mentions technical challenges, algorithm selection, data structure selection, complexity analysis, technical risks, prototype validation, POC, spike, technical research, performance trade-offs, space trade-offs, time complexity, implementation complexity, technical breakthroughs, decomposition strategies, or involves complexity assessment and technical risk identification from steps/12 design baseline.
+  Use this skill when: the user mentions technical challenges, algorithm selection, data structure selection, complexity analysis, technical risks, prototype validation, POC, spike, technical research, performance trade-offs, space trade-offs, time complexity, implementation complexity, technical breakthroughs, decomposition strategies, or involves complexity assessment and technical risk identification from Plan phase outputs (spec-writing, api-contract-design, engineering-principles, etc.).
 ---
 
 # Implementation Complexity Analysis

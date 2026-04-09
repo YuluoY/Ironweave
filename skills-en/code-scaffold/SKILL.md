@@ -2,7 +2,7 @@
 name: code-scaffold
 description: >-
   Generate project code scaffolding from design documents — including directory structure, layered architecture, Entity/Repository/Service skeletons, configuration files, and test framework initialization. Core tool for the execution phase, transforming Plan phase outputs (domain models, sequence designs, component designs) into a compilable and runnable project framework.
-  Use this skill when: the user requests project initialization, code scaffolding generation, project structure setup, creating Entities, Repositories, Services, project scaffolds, initialization, design-to-code transformation, component structure generation, code generation, module registration, or involves converting steps/09 sequence designs and steps/10 component designs into actual code.
+  Use this skill when: the user requests project initialization, code scaffolding generation, project structure setup, creating Entities, Repositories, Services, project scaffolds, initialization, design-to-code transformation, component structure generation, code generation, module registration, or involves converting spec-writing interaction flows, api-contract-design endpoint contracts, and engineering-principles architecture patterns into actual code.
 ---
 
 # Code Scaffold Generation

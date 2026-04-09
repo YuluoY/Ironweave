@@ -2,7 +2,7 @@
 name: integration-test-design
 description: >-
   Integration test design — starting from sequence designs and boundary scenarios, generates inter-module integration test strategies, test environment configurations, and test case skeletons. Covers TestContainers, Mock vs real dependency trade-offs, contract testing, API testing, and more.
-  Use this skill when: the user mentions integration tests, TestContainers, API testing, contract tests, E2E tests, inter-module testing, mock databases, test environments, test isolation, test strategies, end-to-end tests, regression tests, interface integration tests, or involves multi-module interaction testing from steps/09 sequence design and steps/11 boundary design.
+  Use this skill when: the user mentions integration tests, TestContainers, API testing, contract tests, E2E tests, inter-module testing, mock databases, test environments, test isolation, test strategies, end-to-end tests, regression tests, interface integration tests, or involves multi-module interaction testing based on spec-writing interaction flows and api-contract-design boundary conditions.
 ---
 
 # Integration Test Design

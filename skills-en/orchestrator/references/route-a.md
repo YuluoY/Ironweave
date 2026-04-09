@@ -1,5 +1,9 @@
 # A: New Project
 
+⛔ **Path Lock**: The Mermaid flowcharts in this route are mandatory execution paths, not references. Every node must be executed in arrow order; conditional branches follow actual conditions. Do not skip any node or exit early. After completing each node, follow the arrow to the next.
+
+---
+
 ## Plan
 
 ### First Slice (or Single-Slice Mode)
