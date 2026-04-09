@@ -1,7 +1,7 @@
 ---
 name: project-context
 description: >-
-  Project structure awareness and persistence — maintains project file tree snapshots and code structure summaries in a SQLite database (.cache/context.db) at the project root, solving the problem of models forgetting project structure across sessions. Passively invoked, never auto-triggers. Only reads project source code (primary data), never modifies files.
+  Infrastructure skill — maintains project file tree snapshots and code structure summaries in a SQLite database (.cache/context.db) at the project root, solving the problem of models forgetting project structure across sessions. Mandatory invocation by orchestrator during context awareness stage (before route selection) and Deliver stage; must not be skipped. Only reads project source code (primary data), never modifies files.
   Use this skill when: understanding overall project structure, querying a module's file list and exported symbols, restoring project structure understanding across sessions, project awareness, context sync, project memory, code summary indexing, viewing project structure. This skill does not modify source code or manage document outputs.
 ---
 
@@ -29,7 +29,7 @@ graph TD
 
 ## Principles
 
-- **Passively invoked**: This skill never auto-triggers; only activated when externally requested.
+- **Mandatory orchestrator invocation**: This is an infrastructure skill, mandatorily invoked by the orchestrator during context awareness (before route selection) and Deliver stages. Must not be skipped.
 - **Source-first**: The db is a cache, not the truth. Incremental validation on relevant scope should precede each query.
 - **Incremental sync**: No full scans — uses file modification time (mtime) + file hash for incremental detection, syncing only changed parts.
 - **Minimal storage**: Stores only structural info and exported symbol signatures, not source code content itself.
@@ -39,7 +39,7 @@ graph TD
 - Path: `{project_root}/.cache/context.db`
 - `.cache/` directory should be added to `.gitignore` (db is a local runtime artifact)
 
-## Core Capabilities (Passive API)
+## Core Capabilities
 
 ### 0. Context Mode Selection
 

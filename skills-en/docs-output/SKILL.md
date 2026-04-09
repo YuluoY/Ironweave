@@ -1,7 +1,7 @@
 ---
 name: docs-output
 description: >-
-  Documentation output management — maintains modular organization and progress tracking for the project docs/ directory. Module documents are organized by business dimension in subdirectories with detailed content; progress records are stored as summaries by date/session hash. Supports multi-person collaboration and cross-session task tracing with Git account identification in file headers. Passively invoked, not auto-triggered.
+  Infrastructure skill — maintains modular organization and progress tracking for the project docs/ directory. Mandatory invocation by orchestrator at end of Plan and during Deliver stages; must not be skipped. Module documents are organized by business dimension in subdirectories with detailed content; progress records are stored as summaries by date/session hash. Supports multi-person collaboration and cross-session task tracing with Git account identification in file headers.
   Use this skill when: creating documents, document directory management, docs directory, deliverable management, output documentation, document output, docs management, module documentation, document classification, multi-person collaborative documentation, cross-session documentation, progress records, task summaries, progress, session records, development logs.
 ---
 
@@ -20,7 +20,7 @@ This Skill manages two types of content in the `docs/` directory: detailed modul
 graph TD
     TASK["Model Executes Task<br/>Requirements Analysis / Bug Fix / Technical Plan"]
     MODULES["docs/{module}/<br/>Module Documents<br/>Detailed Feature Descriptions"]
-    PROGRESS["docs/progress/{date}/{hash}.md<br/>Progress Summaries<br/>Session-level Records"]
+    PROGRESS["docs/progress/{date}/{username}_{hash}.md<br/>Progress Summaries<br/>Session-level Records"]
 
     TASK -->|"Detailed Output"| MODULES
     TASK -->|"Summary Record"| PROGRESS
@@ -32,11 +32,17 @@ graph TD
 
 ## Principles
 
-- **Passively invoked**: This skill does not auto-trigger, only invoked when document creation/management or progress recording is needed.
-- **Modular organization**: Module documents organized by business dimension in subdirectories.
+- **Mandatory orchestrator invocation**: This is an infrastructure skill, mandatorily invoked by the orchestrator at the end of Plan and during Deliver stages. Must not be skipped.
+- **Modular organization (mandatory)**: Module documents must be organized by business dimension in subdirectories (e.g., `docs/auth/login.md`). **Flat output is forbidden** (e.g., `docs/login.md`).
 - **One file per session**: Progress records stored independently by date/session hash, no multi-person conflicts.
 - **Structure only, not content format**: Document content format is determined by the caller.
 - **Git account identification**: Progress record headers include developer Git account.
+
+## Forbidden
+
+- **DO NOT** place documents directly under `docs/` root (e.g., `docs/login.md`). Must be in business module subdirectories (e.g., `docs/auth/login.md`).
+- **DO NOT** skip this skill. If a task produces documentation, it must be organized through this skill.
+- **DO NOT** omit progress records. Every completed task must write to `docs/progress/{date}/{username}_{hash}.md`.
 
 ## Directory Structure
 
@@ -50,10 +56,10 @@ docs/
 │   └── settings.md
 ├── progress/                          # Progress records
 │   ├── 2024-01-15/
-│   │   ├── a3f8c1.md                  # Session hash
-│   │   └── b7d2e4.md
+│   │   ├── zhangsan_a3f8c1.md         # username_session-hash
+│   │   └── lisi_b7d2e4.md
 │   ├── 2024-01-16/
-│   │   └── c9e5f0.md
+│   │   └── zhangsan_c9e5f0.md
 │   └── archive/                       # Archive (>30 days)
 │       └── 2024-01/
 │           └── ...
@@ -68,39 +74,51 @@ docs/
 
 ### Progress Record Rules
 
-- Path: `docs/progress/{YYYY-MM-DD}/{session-hash}.md`
+- Path: `docs/progress/{YYYY-MM-DD}/{username}_{session-hash}.md`
+- username: from `git config user.name` (spaces replaced with `-`, lowercased)
 - Session hash: 6-digit random hexadecimal (e.g., `a3f8c1`), ensures uniqueness
+- **Same-session append**: Within the same Agent session window, all progress records are appended to the same file — no new files created. A new session hash is generated only when switching to a new session window.
 - Multiple session files per day allowed (different people/different tasks)
 
 > Complete naming rules in → `references/naming-rules.md`
 
 ## Progress Record Template
 
+Each file contains one or more **record entries**. After each task is completed within the same session, append a new `---`-separated entry. **Only include sections that have content** — empty sections are omitted:
+
 ```markdown
-# {Topic}
+# Session Progress: {username}_{hash}
 
-- **Date**: YYYY-MM-DD
-- **Developer**: {git user.name} <{git user.email}>
-- **Type**: Feature Development | Bug Fix | Technical Plan | Refactoring | Other
+> huyongle <568055454@qq.com> · 2026-04-09 10:38:13 start
 
-## Task Summary
+---
 
-(One or two sentences describing what was accomplished in this session)
+## [10:38:13] User Auth Module Requirements Analysis · Feature Development
 
-## Changed Files
+Completed domain model design for login/register flow
 
-- `path/to/file1.ts` — Reason for change
+- `docs/auth/login.md` — Added login flow documentation
 
-## Decision Records
+> **Decision**: Adopted JWT + Refresh Token dual-token scheme
 
-(Brief record of important technical decisions)
+---
 
-## Remaining Issues
+## [10:52:40] Fix Token Refresh Race Condition · Bug Fix
 
-(Incomplete items or issues to follow up on)
+Concurrent refresh overwrites new token with old one; resolved with mutex lock
+
+> **Remaining**: Add refresh token expiry degradation plan
+
+---
+
+## [11:05:22] Code Review · Other
+
+Review PR #42, no changes
 ```
 
-## Core Capabilities (Passive API)
+> Rule: Type merged into heading (`[time] topic · type`); changed files listed directly after summary; decisions/remaining use `>` blockquotes; empty sections omitted.
+
+## Core Capabilities
 
 ### 1. create — Create Module Document
 
@@ -111,11 +129,11 @@ Creates a new document in the specified module directory.
 
 ### 2. progress — Record Progress
 
-Creates a session progress summary.
+Creates or appends a session progress record.
 
-- Automatically obtains Git account information
-- Generates date directory and session hash file
-- Fills progress template
+- First call: creates `{username}_{hash}.md` with header (Git info) + first entry
+- With `--session-id`: appends entry to existing file, each entry timestamped `[HH:mm:ss]` to the second
+- Returns `session_id` for reuse in subsequent calls
 
 ### 3. list — List Documents
 
@@ -140,7 +158,7 @@ Moves progress records older than 30 days to `progress/archive/YYYY-MM/`.
 
 ```bash
 python scripts/docs_manager.py create   --root <project_root> --module <module_name> --name <doc_name> [--title <heading>]
-python scripts/docs_manager.py progress --root <project_root> --topic <topic> --type <type> --summary <summary> [--files <changed_files_JSON>] [--decisions <decisions>] [--todos <remaining>]
+python scripts/docs_manager.py progress --root <project_root> --topic <topic> --type <type> --summary <summary> [--session-id <session_id>] [--files <changed_files_JSON>] [--decisions <decisions>] [--todos <remaining>]
 python scripts/docs_manager.py list     --root <project_root>
 python scripts/docs_manager.py validate --root <project_root>
 python scripts/docs_manager.py archive  --root <project_root> [--older-than <days>]

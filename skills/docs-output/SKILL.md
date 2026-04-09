@@ -1,7 +1,7 @@
 ---
 name: docs-output
 description: >-
-  文档产出管理——维护项目 docs/ 目录的模块化组织和进度追踪。模块文档按业务维度分目录存放详细内容，进度记录按日期/会话hash存放摘要。支持多人协作和跨会话任务追溯，文件头部标识 Git 账号。被动调用，不会主动触发。
+  基础设施技能——维护项目 docs/ 目录的模块化组织和进度追踪。由编排器在 Plan 末尾和 Deliver 阶段强制调用，禁止跳过。模块文档按业务维度分目录存放详细内容，进度记录按日期/会话hash存放摘要。支持多人协作和跨会话任务追溯，文件头部标识 Git 账号。
   务必在以下场景使用本 skill：创建文档、文档目录管理、docs 目录、产出物管理、输出文档、document output、docs management、模块文档、文档分类、多人协作文档、跨会话文档、进度记录、任务摘要、progress、会话记录、开发日志。
 ---
 
@@ -32,11 +32,17 @@ graph TD
 
 ## 原则
 
-- **被动调用**：本 skill 不会自动触发，仅在需要创建/管理文档或记录进度时被调用。
-- **模块化组织**：模块文档按业务维度分目录。
+- **编排器强制调用**：本 skill 是基础设施，由 orchestrator 在 Plan 末尾和 Deliver 阶段强制调用，禁止跳过。
+- **模块化组织（强制）**：模块文档必须按业务维度分目录（如 `docs/auth/login.md`）。**禁止扁平输出**（如 `docs/login.md`）。
 - **一会话一文件**：进度记录按日期/会话hash独立存放，多人不冲突。
 - **只管结构不管内容格式**：文档内容格式由调用方决定。
 - **Git 账号标识**：进度记录头部包含开发者 Git 账号。
+
+## 禁止事项
+
+- **禁止**将文档直接放在 `docs/` 根目录下（如 `docs/login.md`）。必须放在业务模块子目录下（如 `docs/auth/login.md`）。
+- **禁止**跳过本 skill。如果任务产生了文档，必须通过本 skill 组织存放。
+- **禁止**省略进度记录。每次任务完成必须写入 `docs/progress/{date}/{username}_{hash}.md`。
 
 ## 目录结构
 
@@ -50,10 +56,10 @@ docs/
 │   └── settings.md
 ├── progress/                          # 进度记录
 │   ├── 2024-01-15/
-│   │   ├── a3f8c1.md                  # 会话hash
-│   │   └── b7d2e4.md
+│   │   ├── zhangsan_a3f8c1.md         # 用户名_会话hash
+│   │   └── lisi_b7d2e4.md
 │   ├── 2024-01-16/
-│   │   └── c9e5f0.md
+│   │   └── zhangsan_c9e5f0.md
 │   └── archive/                       # 归档（>30天）
 │       └── 2024-01/
 │           └── ...
@@ -68,39 +74,51 @@ docs/
 
 ### 进度记录规则
 
-- 路径：`docs/progress/{YYYY-MM-DD}/{会话hash}.md`
+- 路径：`docs/progress/{YYYY-MM-DD}/{username}_{会话hash}.md`
+- username：取 `git config user.name`（空格替换为 `-`，全小写）
 - 会话hash：6位随机十六进制（如 `a3f8c1`），保证唯一
+- **同会话持续追加**：同一个 Agent 会话窗口内，所有进度记录追加到同一个文件中，不新建文件。只有切换到新会话窗口时才生成新的会话hash。
 - 同一天可有多个会话文件（不同人/不同任务）
 
 > 完整命名规则见 → `references/naming-rules.md`
 
 ## 进度记录模板
 
+每个文件包含一个或多个**记录条目**。同会话中每完成一个任务，追加一个 `---` 分隔的条目。**仅包含有内容的段落**，空段落不输出：
+
 ```markdown
-# {主题}
+# 会话进度：{username}_{hash}
 
-- **日期**: YYYY-MM-DD
-- **开发者**: {git user.name} <{git user.email}>
-- **类型**: 需求开发 | Bug修复 | 技术方案 | 重构 | 其他
+> huyongle <568055454@qq.com> · 2026-04-09 10:38:13 起
 
-## 任务摘要
+---
 
-（一两句话描述本次会话完成了什么）
+## [10:38:13] 用户认证模块需求分析 · 需求开发
 
-## 变更文件
+完成登录/注册流程的领域模型设计
 
-- `path/to/file1.ts` — 修改原因
+- `docs/auth/login.md` — 新增登录流程文档
 
-## 决策记录
+> **决策**: 采用 JWT + Refresh Token 双令牌方案
 
-（简要记录重要的技术决策）
+---
 
-## 遗留问题
+## [10:52:40] 修复 Token 刷新竞态 · Bug修复
 
-（未完成的事项或待跟进的问题）
+并发 refresh 导致旧 token 覆盖新 token，用互斥锁解决
+
+> **遗留**: 补充 refresh token 过期降级方案
+
+---
+
+## [11:05:22] 代码审查 · 其他
+
+Review PR #42，无变更
 ```
 
-## 核心能力（被动 API）
+> 规则：类型合并到标题（`[时间] 主题 · 类型`）；变更文件直接列在摘要后；决策/遗留用 `>` 引用块；无内容的段落不输出。
+
+## 核心能力
 
 ### 1. create — 创建模块文档
 
@@ -111,11 +129,11 @@ docs/
 
 ### 2. progress — 记录进度
 
-创建一份会话进度摘要。
+创建或追加会话进度记录。
 
-- 自动获取 Git 账号信息
-- 生成日期目录和会话hash文件
-- 填充进度模板
+- 首次调用：新建 `{username}_{hash}.md`，写入头部（Git 信息）+ 首条记录
+- 传入 `--session-id`：追加条目到已有文件，每条记录带 `[HH:mm:ss]` 秒级时间
+- 返回 `session_id`，后续调用复用
 
 ### 3. list — 列出文档
 
@@ -140,7 +158,7 @@ docs/
 
 ```bash
 python scripts/docs_manager.py create   --root <project_root> --module <模块名> --name <文档名> [--title <一级标题>]
-python scripts/docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--files <变更文件JSON>] [--decisions <决策>] [--todos <遗留>]
+python scripts/docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--session-id <会话ID>] [--files <变更文件JSON>] [--decisions <决策>] [--todos <遗留>]
 python scripts/docs_manager.py list     --root <project_root>
 python scripts/docs_manager.py validate --root <project_root>
 python scripts/docs_manager.py archive  --root <project_root> [--older-than <天数>]

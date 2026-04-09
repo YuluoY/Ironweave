@@ -18,14 +18,14 @@ docs/
 │   └── overview.md
 └── progress/                   # 进度记录
     ├── 2025-01-15/
-    │   ├── a3f2c1.md
-    │   └── b7e4d9.md
+    │   ├── zhangsan_a3f2c1.md
+    │   └── lisi_b7e4d9.md
     ├── 2025-01-16/
-    │   └── c8a1f0.md
+    │   └── zhangsan_c8a1f0.md
     └── archive/                # 归档（>30天自动迁移）
         └── 2024-12/
             └── 2024-12-10/
-                └── d1e2f3.md
+                └── zhangsan_d1e2f3.md
 ```
 
 ## 命名规范
@@ -35,7 +35,7 @@ docs/
 | 一级目录 | 业务模块名，kebab-case | `auth`、`user`、`order-management` |
 | 二级文件 | 页面/功能点名，kebab-case，`.md` 扩展名 | `login.md`、`create-order.md` |
 | 进度日期目录 | `YYYY-MM-DD` 格式 | `2025-01-15` |
-| 进度文件 | 6 位十六进制会话 hash | `a3f2c1.md` |
+| 进度文件 | `{username}_{6位十六进制hash}` | `zhangsan_a3f2c1.md` |
 | 归档月度目录 | `YYYY-MM` 格式 | `2024-12` |
 
 ## 详细规则

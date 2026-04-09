@@ -12,6 +12,23 @@ description: >-
 
 ---
 
+## ⛔ 强制执行协议（不可跳过）
+
+**收到开发任务后，必须通过本编排链来处理，禁止绕过编排链直接实现。** 理解用户需求是第一步，但理解之后必须通过以下流程决定执行方式：
+
+1. **输入分类** → 分析用户需求，4 维度评估，确定档位（Pinpoint / Bounded / Complex / Grand）
+2. **project-context** → 感知项目上下文（基础设施 skill，禁止跳过）
+3. **task-difficulty** → 评估难度（L1-L5），确定变体（lite / standard / plus）
+4. **宏观澄清**（如需） → Grand 或 L4+ 或 需求模糊时，用 requirement-qa + brainstorm
+5. **范围切片** → 将任务拆分为有序 slice
+6. **路径选择** → 根据项目类型选择 Route A/B/C/D
+7. **逐 slice 执行** → Plan → Execute → Validate → Deliver，每个阶段转换处有质量卡点
+8. **docs-output** → 每个 slice 的 Plan 末尾和 Deliver 阶段强制同步（基础设施 skill，禁止跳过）
+
+**违规判定**：如果你理解需求后跳过了步骤 1-3 直接写代码，这是违规行为。立即停止，回到步骤 1 重新开始。
+
+---
+
 ## 全局约束
 
 以下两条规则贯穿所有阶段和 skill，不可豁免：

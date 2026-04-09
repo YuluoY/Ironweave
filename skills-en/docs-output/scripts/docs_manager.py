@@ -4,10 +4,12 @@ docs-output: 文档产出管理脚本（模块文档 + 进度记录）
 
 用法:
     python docs_manager.py create   --root <project_root> --module <模块名> --name <文档名> [--title <标题>]
-    python docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--files <JSON>] [--decisions <决策>] [--todos <遗留>]
+    python docs_manager.py progress --root <project_root> --topic <主题> --type <类型> --summary <摘要> [--session-id <ID>] [--files <JSON>] [--decisions <决策>] [--todos <遗留>]
     python docs_manager.py list     --root <project_root>
     python docs_manager.py validate --root <project_root>
     python docs_manager.py archive  --root <project_root> [--older-than <天数>]
+
+同会话追加：首次调用 progress 会返回 session_id，后续用 --session-id 追加到同一文件。
 """
 
 import argparse
@@ -64,13 +66,30 @@ def get_git_user(root: str) -> dict:
     return info
 
 
+def make_username(root: str) -> str:
+    """从 git config user.name 生成文件名前缀：小写、空格替换为 -。"""
+    git_user = get_git_user(root)
+    name = git_user["name"]
+    return re.sub(r"\s+", "-", name).lower()
+
+
 def session_hash() -> str:
     """生成 6 位会话 hash。"""
     return secrets.token_hex(3)
 
 
 def now_date() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return datetime.now().strftime("%Y-%m-%d")
+
+
+def now_time() -> str:
+    """当前时间，精确到秒。"""
+    return datetime.now().strftime("%H:%M:%S")
+
+
+def now_datetime() -> str:
+    """当前日期时间，精确到秒。"""
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def scan_modules(docs_dir: Path) -> dict[str, list[dict]]:
@@ -100,7 +119,7 @@ def scan_progress(progress_dir: Path, days: int | None = None) -> list[dict]:
 
     cutoff = None
     if days is not None:
-        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+        cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
 
     for date_dir in sorted(progress_dir.iterdir(), reverse=True):
         if not date_dir.is_dir() or date_dir.name == ARCHIVE_DIR:
@@ -110,9 +129,15 @@ def scan_progress(progress_dir: Path, days: int | None = None) -> list[dict]:
         for md in sorted(date_dir.iterdir()):
             if md.suffix == ".md":
                 title = extract_title(md)
+                # 解析 {username}_{hash}.md
+                stem = md.stem
+                parts = stem.rsplit("_", 1)
+                username = parts[0] if len(parts) == 2 else ""
+                file_hash = parts[1] if len(parts) == 2 else stem
                 results.append({
                     "date": date_dir.name,
-                    "hash": md.stem,
+                    "username": username,
+                    "session_id": file_hash,
                     "title": title,
                     "file": f"{PROGRESS_DIR}/{date_dir.name}/{md.name}",
                 })
@@ -146,73 +171,94 @@ def cmd_create(root: str, module: str, name: str, title: str | None = None):
     }, ensure_ascii=False))
 
 
-PROGRESS_TEMPLATE = """# {topic}
+def _build_header(username: str, h: str, git_user: dict) -> str:
+    """构建进度文件头部（仅在新建文件时写入一次）。"""
+    developer = f"{git_user['name']} <{git_user['email']}>" if git_user["email"] else git_user["name"]
+    return (
+        f"# 会话进度：{username}_{h}\n\n"
+        f"> {developer} \u00b7 {now_datetime()} 起\n"
+    )
 
-- **日期**: {date}
-- **开发者**: {developer}
-- **类型**: {record_type}
 
-## 任务摘要
+def _build_entry(topic: str, record_type: str, summary: str,
+                 files_text: str | None, decisions: str | None,
+                 todos: str | None) -> str:
+    """构建单个进度条目。类型合并到标题，仅包含有内容的段落。"""
+    time_str = now_time()
+    parts = [
+        f"\n---\n\n"
+        f"## [{time_str}] {topic} \u00b7 {record_type}\n\n"
+        f"{summary}\n"
+    ]
+    if files_text:
+        parts.append(f"\n{files_text}\n")
+    if decisions:
+        parts.append(f"\n> **决策**: {decisions}\n")
+    if todos:
+        parts.append(f"\n> **遗留**: {todos}\n")
+    return "".join(parts)
 
-{summary}
 
-## 变更文件
-
-{files}
-
-## 决策记录
-
-{decisions}
-
-## 遗留问题
-
-{todos}
-"""
+def _parse_files(files: str | None) -> str | None:
+    """解析变更文件参数。无内容返回 None。"""
+    if not files:
+        return None
+    try:
+        file_list = json.loads(files)
+        return "\n".join(f"- `{f['path']}` — {f.get('reason', '')}" for f in file_list)
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return files
 
 
 def cmd_progress(root: str, topic: str, record_type: str, summary: str,
-                 files: str | None = None, decisions: str | None = None, todos: str | None = None):
+                 session_id: str | None = None,
+                 files: str | None = None, decisions: str | None = None,
+                 todos: str | None = None):
     progress_dir = get_progress_dir(root)
     date = now_date()
     date_dir = progress_dir / date
     date_dir.mkdir(parents=True, exist_ok=True)
 
-    h = session_hash()
-    filepath = date_dir / f"{h}.md"
-    # 极小概率碰撞
-    while filepath.exists():
-        h = session_hash()
-        filepath = date_dir / f"{h}.md"
-
-    # 获取 Git 用户
+    username = make_username(root)
     git_user = get_git_user(root)
-    developer = f"{git_user['name']} <{git_user['email']}>" if git_user["email"] else git_user["name"]
+    files_text = _parse_files(files)
 
-    # 解析变更文件
-    files_text = "（无）"
-    if files:
-        try:
-            file_list = json.loads(files)
-            files_text = "\n".join(f"- `{f['path']}` — {f.get('reason', '')}" for f in file_list)
-        except (json.JSONDecodeError, KeyError, TypeError):
-            files_text = files
-
-    content = PROGRESS_TEMPLATE.format(
+    entry = _build_entry(
         topic=topic,
-        date=date,
-        developer=developer,
         record_type=record_type,
         summary=summary,
-        files=files_text,
-        decisions=decisions or "（无）",
-        todos=todos or "（无）",
+        files_text=files_text,
+        decisions=decisions,
+        todos=todos,
     )
 
-    filepath.write_text(content, encoding="utf-8")
+    if session_id:
+        # ── 追加到已有会话文件 ──
+        filepath = date_dir / f"{username}_{session_id}.md"
+        if not filepath.exists():
+            print(json.dumps({
+                "status": "error",
+                "message": f"Session file not found: {filepath.name}. Use without --session-id to start a new session.",
+            }, ensure_ascii=False))
+            return
+        with open(filepath, "a", encoding="utf-8") as f:
+            f.write(entry)
+        h = session_id
+    else:
+        # ── 新建会话文件 ──
+        h = session_hash()
+        filepath = date_dir / f"{username}_{h}.md"
+        while filepath.exists():
+            h = session_hash()
+            filepath = date_dir / f"{username}_{h}.md"
+        header = _build_header(username, h, git_user)
+        filepath.write_text(header + entry, encoding="utf-8")
 
+    developer = f"{git_user['name']} <{git_user['email']}>" if git_user["email"] else git_user["name"]
     print(json.dumps({
         "status": "ok",
-        "file": f"{PROGRESS_DIR}/{date}/{h}.md",
+        "session_id": h,
+        "file": f"{PROGRESS_DIR}/{date}/{username}_{h}.md",
         "developer": developer,
         "path": str(filepath),
     }, ensure_ascii=False))
@@ -318,6 +364,8 @@ def main():
     p_progress.add_argument("--type", required=True, dest="record_type",
                             choices=["需求开发", "Bug修复", "技术方案", "重构", "其他"])
     p_progress.add_argument("--summary", required=True, help="任务摘要")
+    p_progress.add_argument("--session-id", default=None, dest="session_id",
+                            help="已有会话ID（追加到同一文件），不传则新建会话")
     p_progress.add_argument("--files", default=None, help="变更文件JSON数组")
     p_progress.add_argument("--decisions", default=None, help="决策记录")
     p_progress.add_argument("--todos", default=None, help="遗留问题")
@@ -339,8 +387,10 @@ def main():
         cmd_create(args.root, args.module, args.name, getattr(args, "title", None))
     elif args.command == "progress":
         cmd_progress(args.root, args.topic, args.record_type, args.summary,
-                     getattr(args, "files", None), getattr(args, "decisions", None),
-                     getattr(args, "todos", None))
+                     session_id=getattr(args, "session_id", None),
+                     files=getattr(args, "files", None),
+                     decisions=getattr(args, "decisions", None),
+                     todos=getattr(args, "todos", None))
     elif args.command == "list":
         cmd_list(args.root)
     elif args.command == "validate":

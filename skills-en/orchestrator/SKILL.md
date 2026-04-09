@@ -12,6 +12,23 @@ Receive user input → **Input Classification** → Adaptive context sensing →
 
 ---
 
+## ⛔ Mandatory Execution Protocol (DO NOT SKIP)
+
+**After receiving a development task, you must process it through this orchestration chain. Bypassing the chain to implement directly is forbidden.** Understanding the user's requirements is the first step, but after understanding, you must determine the execution approach through this flow:
+
+1. **Input Classification** → Analyze user requirements, 4-dimension assessment, determine tier (Pinpoint / Bounded / Complex / Grand)
+2. **project-context** → Sense project context (infrastructure skill, must not skip)
+3. **task-difficulty** → Score difficulty (L1-L5), determine variant (lite / standard / plus)
+4. **Macro clarification** (if needed) → For Grand, L4+, or ambiguous requirements, use requirement-qa + brainstorm
+5. **Scope slicing** → Break task into ordered slices
+6. **Route selection** → Choose Route A/B/C/D based on project type
+7. **Per-slice execution** → Plan → Execute → Validate → Deliver, with quality gates at each transition
+8. **docs-output** → Mandatory sync at end of Plan and during Deliver for every slice (infrastructure skill, must not skip)
+
+**Violation check**: If you understood the requirements but skipped steps 1-3 and jumped directly to writing code, this is a violation. Stop immediately and restart from step 1.
+
+---
+
 ## Global Constraints
 
 The following two rules apply across all phases and skills, no exceptions:

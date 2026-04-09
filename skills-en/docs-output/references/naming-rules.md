@@ -18,14 +18,14 @@ docs/
 │   └── overview.md
 └── progress/                   # Progress records
     ├── 2025-01-15/
-    │   ├── a3f2c1.md
-    │   └── b7e4d9.md
+    │   ├── zhangsan_a3f2c1.md
+    │   └── lisi_b7e4d9.md
     ├── 2025-01-16/
-    │   └── c8a1f0.md
+    │   └── zhangsan_c8a1f0.md
     └── archive/                # Archive (auto-migrate after >30 days)
         └── 2024-12/
             └── 2024-12-10/
-                └── d1e2f3.md
+                └── zhangsan_d1e2f3.md
 ```
 
 ## Naming Conventions
@@ -35,7 +35,7 @@ docs/
 | Top-level directory | Business module name, kebab-case | `auth`, `user`, `order-management` |
 | Second-level files | Page/feature name, kebab-case, `.md` extension | `login.md`, `create-order.md` |
 | Progress date directory | `YYYY-MM-DD` format | `2025-01-15` |
-| Progress files | 6-character hex session hash | `a3f2c1.md` |
+| Progress files | `{username}_{6-char hex hash}` | `zhangsan_a3f2c1.md` |
 | Archive monthly directory | `YYYY-MM` format | `2024-12` |
 
 ## Detailed Rules
