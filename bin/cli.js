@@ -71,10 +71,14 @@ if (command === 'init') {
   const skillsLabel = isSingleDirAgent ? `${dirBasedAgents[agent]}/skills/` : 'skills/';
   console.log(`✓ ${skillsLabel} copied (${lang === 'en' ? 'English' : 'Chinese'})`);
 
-  const srcHooks = path.join(pkgDir, 'hooks');
-  const dstHooks = path.join(targetDir, 'hooks');
-  copyDirRecursive(srcHooks, dstHooks, force);
-  console.log('✓ hooks/ copied');
+  // Only install hooks for agents that use them (cursor, claude, or all)
+  const hooksAgents = ['cursor', 'claude', 'all'];
+  if (hooksAgents.includes(agent)) {
+    const srcHooks = path.join(pkgDir, 'hooks');
+    const dstHooks = path.join(targetDir, 'hooks');
+    copyDirRecursive(srcHooks, dstHooks, force);
+    console.log('✓ hooks/ copied');
+  }
 
   if (!skillsOnly) {
     const agentFiles = {
