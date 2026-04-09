@@ -286,11 +286,18 @@ ironweave/
 
 ## Philosophy
 
-- **Adaptive routing** over linear workflows — different task types need different flows
-- **Quality gates with reflow** over pass/fail — failures route back to the right phase
-- **Scope slicing** before execution — large tasks split into ordered, independently deliverable slices
-- **Overhead scales with complexity** — simple tasks stay fast (lite), hard tasks get full rigor (plus)
-- **Skills as methodology** — each skill encodes decision trees, not just templates
+Ironweave is built around one insight: **AI coding agents have systematic cognitive weaknesses** — they underestimate complexity, skip validation, lose context across sessions, and forget what they planned. Every mechanism in Ironweave targets a specific weakness.
+
+- **Path Lock, Not Suggestions** — Flowcharts in route files are mandatory execution paths, not references. Every node must be executed in arrow order. AI is not trusted to self-police completeness.
+- **Throttle Before You Build** — Difficulty scoring with built-in upward bias acts as a throttle valve. Because AI systematically underestimates complexity, the score is nudged up unless the task is clearly trivial.
+- **Weight Matches Problem** — Three variants (lite / standard / plus) ensure simple tasks stay fast and hard tasks get full rigor. The overhead of the process should match the risk of the problem.
+- **Evidence, Not Vibes** — Every decision must anchor to project context facts. "Industry best practice" alone is not a valid justification. If no evidence is found, the assumption must be explicitly labeled.
+- **Recommended ≠ Mandatory** — Tech reference tables provide default recommendations for quick decisions, but users can choose any technology — including ones not listed. The human always has the final say.
+- **Persist Then Forget** — Each skill writes output to files. Subsequent steps read from files, never from window memory. This directly counters AI context window overflow and attention decay.
+- **Reflow, Not Restart** — When validation fails, work routes back to the exact level that broke: code-level → Execute, design-level → Plan, requirement-level → scope. No full teardowns for local issues.
+- **Mechanical Reconciliation** — At delivery, a checklist comparison (Plan outputs vs. actual files) catches gaps that AI memory would miss. Trust the filesystem, not the model.
+- **Source Is Truth** — All caches, databases, and generated docs are derivatives of source. When conflicts arise, source wins.
+- **Human Override Always** — Users can override classification and difficulty with natural language at any point. The system has defaults; humans have final authority.
 
 ## Contributing
 
