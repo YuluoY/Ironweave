@@ -1,6 +1,6 @@
-# Contributing to Ironweave
+# Contributing to Nimis
 
-Thank you for your interest in contributing! Ironweave welcomes contributions from everyone.
+Thank you for your interest in contributing! Nimis welcomes contributions from everyone.
 
 ## Ways to Contribute
 
@@ -12,8 +12,8 @@ Thank you for your interest in contributing! Ironweave welcomes contributions fr
 ## Development Setup
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
-cd ironweave
+git clone https://github.com/YuluoY/nimis.git
+cd nimis
 ```
 
 No build step required — skills are plain Markdown files.

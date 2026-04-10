@@ -1,5 +1,6 @@
 # Private / non-open-source files
 steps/
+specs/
 AI-Coding.md
 Tasks.md
 docs/
@@ -25,3 +26,6 @@ dist/
 
 # Python
 __pycache__/
+
+# AI context database
+.ai/

@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">Ironweave</h1>
+  <h1 align="center">Nimis</h1>
   <p align="center">
     An agentic skills framework & software development methodology for your AI coding agents.
   </p>
@@ -10,7 +10,7 @@
 
 ---
 
-Ironweave is a complete software development workflow for your coding agents, built on top of a set of composable **skills**. It doesn't just write code — it steps back, understands what you're building, plans the work, breaks it into slices, and executes each slice with built-in quality gates. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Ironweave.
+Nimis is a complete software development workflow for your coding agents, built on top of a set of composable **skills**. It doesn't just write code — it steps back, understands what you're building, plans the work, breaks it into slices, and executes each slice with built-in quality gates. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Nimis.
 
 ## How it works
 
@@ -102,29 +102,29 @@ User Request
 
 ```bash
 # Install all skills + all agent configs (Chinese, default)
-npx ironweave@latest init
+npx nimis@latest init
 
 # Install English skills
-npx ironweave@latest init --lang en
+npx nimis@latest init --lang en
 
 # Install for a specific editor only
-npx ironweave@latest init --agent cursor
-npx ironweave@latest init --agent trae
-npx ironweave@latest init --agent windsurf
+npx nimis@latest init --agent cursor
+npx nimis@latest init --agent trae
+npx nimis@latest init --agent windsurf
 
 # Only copy skills, skip agent config files
-npx ironweave@latest init --skills-only
+npx nimis@latest init --skills-only
 
 # Overwrite existing files
-npx ironweave@latest init --force
+npx nimis@latest init --force
 
 # List all available skills
-npx ironweave@latest list
+npx nimis@latest list
 ```
 
 Available agents: `claude`, `copilot`, `cursor`, `windsurf`, `cline`, `trae`, `codebuddy`, `codex`, `gemini`, `all` (default).
 
-> **Conflict handling**: Existing files are preserved by default. Ironweave adds its config alongside your existing rules. Use `--force` to overwrite.
+> **Conflict handling**: Existing files are preserved by default. Nimis adds its config alongside your existing rules. Use `--force` to overwrite.
 
 > **Skills location**: When targeting a single directory-based editor (e.g., `--agent trae`), skills are installed inside the editor directory (e.g., `.trae/skills/`). With `--agent all` (default), skills go to the project root `skills/`.
 
@@ -132,36 +132,36 @@ Available agents: `claude`, `copilot`, `cursor`, `windsurf`, `cline`, `trae`, `c
 
 ```bash
 # Install to a specific editor (recommended)
-npx skills add YuluoY/ironweave --skill '*' -a cursor -y
-npx skills add YuluoY/ironweave --skill '*' -a trae -y
-npx skills add YuluoY/ironweave --skill '*' -a claude-code -y
+npx skills add YuluoY/nimis --skill '*' -a cursor -y
+npx skills add YuluoY/nimis --skill '*' -a trae -y
+npx skills add YuluoY/nimis --skill '*' -a claude-code -y
 
 # Install to multiple editors
-npx skills add YuluoY/ironweave --skill '*' -a cursor -a windsurf -y
+npx skills add YuluoY/nimis --skill '*' -a cursor -a windsurf -y
 
 # Install to ALL editors (installs many agent directories)
-npx skills add YuluoY/ironweave --all
+npx skills add YuluoY/nimis --all
 
 # Interactive: select skills and editors
-npx skills add YuluoY/ironweave
+npx skills add YuluoY/nimis
 
 # List available skills
-npx skills add YuluoY/ironweave --list
+npx skills add YuluoY/nimis --list
 ```
 
 Agent names for skills.sh: `claude-code`, `github-copilot`, `cursor`, `windsurf`, `cline`, `trae`, `codebuddy`, `codex`, `gemini-cli`.
 
-> Note: `skills.sh` does not support `--lang`. For English skills, use `npx ironweave@latest init --lang en`.
+> Note: `skills.sh` does not support `--lang`. For English skills, use `npx nimis@latest init --lang en`.
 
 ### Per-Agent Manual Installation
 
 <details>
 <summary><b>Claude Code</b></summary>
 
-Ironweave ships with `CLAUDE.md` at the project root — Claude Code reads this automatically.
+Nimis ships with `CLAUDE.md` at the project root — Claude Code reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -169,10 +169,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>VS Code GitHub Copilot</b></summary>
 
-Ironweave ships with `.github/copilot-instructions.md` pre-configured.
+Nimis ships with `.github/copilot-instructions.md` pre-configured.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -180,10 +180,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Cursor</b></summary>
 
-Ironweave ships with `.cursor/rules/ironweave.mdc` (`alwaysApply: true`) for auto-discovery.
+Nimis ships with `.cursor/rules/nimis.mdc` (`alwaysApply: true`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -191,10 +191,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Windsurf</b></summary>
 
-Ironweave ships with `.windsurf/rules/ironweave.md` (`trigger: always_on`) for auto-discovery.
+Nimis ships with `.windsurf/rules/nimis.md` (`trigger: always_on`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -202,10 +202,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Cline</b></summary>
 
-Ironweave ships with `.clinerules/ironweave.md` for auto-discovery.
+Nimis ships with `.clinerules/nimis.md` for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -213,10 +213,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Trae</b></summary>
 
-Ironweave ships with `.trae/rules/ironweave.md` for auto-discovery.
+Nimis ships with `.trae/rules/nimis.md` for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -224,10 +224,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>CodeBuddy (Tencent Cloud)</b></summary>
 
-Ironweave ships with `.codebuddy/rules/ironweave/RULE.mdc` (`alwaysApply: true`) for auto-discovery.
+Nimis ships with `.codebuddy/rules/nimis/RULE.mdc` (`alwaysApply: true`) for auto-discovery.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -235,10 +235,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Codex (OpenAI)</b></summary>
 
-Ironweave ships with `AGENTS.md` at the project root — Codex reads this automatically.
+Nimis ships with `AGENTS.md` at the project root — Codex reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -246,10 +246,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Gemini CLI</b></summary>
 
-Ironweave ships with `GEMINI.md` at the project root — Gemini CLI reads this automatically.
+Nimis ships with `GEMINI.md` at the project root — Gemini CLI reads this automatically.
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -257,7 +257,7 @@ git clone https://github.com/YuluoY/ironweave.git
 ## Project Structure
 
 ```
-ironweave/
+nimis/
 ├── skills/                            # Skills (Chinese)
 │   ├── orchestrator/                # Flow orchestrator
 │   │   ├── SKILL.md                # Orchestrator logic
@@ -272,11 +272,11 @@ ironweave/
 ├── AGENTS.md                        # Codex / cross-agent compat
 ├── GEMINI.md                        # Gemini CLI
 ├── .github/copilot-instructions.md    # VS Code Copilot
-├── .cursor/rules/ironweave.mdc        # Cursor
-├── .windsurf/rules/ironweave.md       # Windsurf
-├── .clinerules/ironweave.md           # Cline
-├── .trae/rules/ironweave.md           # Trae
-├── .codebuddy/rules/ironweave/RULE.mdc  # CodeBuddy
+├── .cursor/rules/nimis.mdc        # Cursor
+├── .windsurf/rules/nimis.md       # Windsurf
+├── .clinerules/nimis.md           # Cline
+├── .trae/rules/nimis.md           # Trae
+├── .codebuddy/rules/nimis/RULE.mdc  # CodeBuddy
 ├── README.md
 ├── README_CN.md
 ├── CONTRIBUTING.md
@@ -292,7 +292,7 @@ ironweave/
 
 **Full Traceability** — Every technical decision records *why* it was chosen and *what alternatives were considered*. Progress is persistently tracked (`docs/`). Cross-session context is preserved in SQLite. Nothing relies on memory alone.
 
-**Counter AI Cognitive Weaknesses** — AI agents systematically underestimate complexity, skip validation, lose context across sessions, and forget plans. Ironweave's mechanisms directly target these weaknesses: path lock prevents skipping, difficulty throttle counters underestimation, file persistence defeats context loss, mechanical reconciliation catches omissions.
+**Counter AI Cognitive Weaknesses** — AI agents systematically underestimate complexity, skip validation, lose context across sessions, and forget plans. Nimis's mechanisms directly target these weaknesses: path lock prevents skipping, difficulty throttle counters underestimation, file persistence defeats context loss, mechanical reconciliation catches omissions.
 
 **Human Authority, Machine Execution** — The system provides defaults and recommendations, but humans have unconditional override. Tech choices are recommended, not mandatory. Difficulty scores can be overridden with natural language. AI executes the workflow; humans own the decisions.
 
@@ -313,4 +313,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). Skills live directly in this repositor
 
 ## License
 
-[MIT](./LICENSE) © Ironweave Contributors
+[MIT](./LICENSE) © Nimis Contributors

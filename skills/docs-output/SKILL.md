@@ -43,6 +43,7 @@ graph TD
 - **禁止**将文档直接放在 `docs/` 根目录下（如 `docs/login.md`）。必须放在业务模块子目录下（如 `docs/auth/login.md`）。
 - **禁止**跳过本 skill。如果任务产生了文档，必须通过本 skill 组织存放。
 - **禁止**省略进度记录。每次任务完成必须写入 `docs/progress/{date}/{username}_{hash}.md`。
+- **禁止**手动生成时间戳。所有时间（日期、时分秒）必须由 `docs_manager.py` 脚本产生，禁止 LLM 自行计算或拼接时间字符串（常见错误：UTC时间手动+8小时产生 25:xx 等非法时间）。
 
 ## 目录结构
 
@@ -79,6 +80,7 @@ docs/
 - 会话hash：6位随机十六进制（如 `a3f8c1`），保证唯一
 - **同会话持续追加**：同一个 Agent 会话窗口内，所有进度记录追加到同一个文件中，不新建文件。只有切换到新会话窗口时才生成新的会话hash。
 - 同一天可有多个会话文件（不同人/不同任务）
+- **必须使用脚本**：进度记录的创建和追加必须通过 `python scripts/docs_manager.py progress` 命令执行，禁止 LLM 直接生成/写入进度 Markdown 文件。脚本保证时间戳使用系统本地时间（`datetime.now()`），避免时区计算错误。
 
 > 完整命名规则见 → `references/naming-rules.md`
 

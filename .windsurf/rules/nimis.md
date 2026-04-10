@@ -2,7 +2,7 @@
 trigger: always_on
 ---
 
-# Ironweave
+# Nimis
 
 ⛔ **MANDATORY**: For ALL development tasks, you MUST first read `skills/orchestrator/SKILL.md` and follow its execution protocol. Do not skip this step.
 

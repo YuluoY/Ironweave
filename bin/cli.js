@@ -8,11 +8,11 @@ const command = args[0] || 'init';
 
 if (command === '--help' || command === '-h') {
   console.log(`
-ironweave - Agentic skills framework for AI coding agents
+nimis - Agentic skills framework for AI coding agents
 
 Usage:
-  npx ironweave init [options]     Install skills into current project
-  npx ironweave list               List all available skills
+  npx nimis init [options]     Install skills into current project
+  npx nimis list               List all available skills
 
 Options:
   --agent <name>    Only install config for specific agent
@@ -34,7 +34,7 @@ if (command === 'list') {
   const skills = fs.readdirSync(skillsDir).filter(f => {
     return fs.statSync(path.join(skillsDir, f)).isDirectory();
   });
-  console.log(`\nIronweave Skills [${listLang}] (${skills.length}):\n`);
+  console.log(`\nNimis Skills [${listLang}] (${skills.length}):\n`);
   skills.forEach(s => console.log(`  - ${s}`));
   console.log('');
   process.exit(0);
@@ -148,11 +148,11 @@ if (command === 'init') {
     });
   }
 
-  console.log('\n🎉 Ironweave installed! Your agent will auto-discover the skills.\n');
+  console.log('\n🎉 Nimis installed! Your agent will auto-discover the skills.\n');
   process.exit(0);
 }
 
-console.error(`Unknown command: ${command}. Run "npx ironweave --help" for usage.`);
+console.error(`Unknown command: ${command}. Run "npx nimis --help" for usage.`);
 process.exit(1);
 
 function copyDirRecursive(src, dst, force) {

@@ -1,6 +1,6 @@
 {
-  "name": "ironweave",
-  "version": "1.2.4",
+  "name": "nimis",
+  "version": "1.1.0",
   "description": "Agentic skills framework for AI coding agents — orchestrated workflows with adaptive routing, quality gates, and 17 composable skills.",
   "keywords": [
     "agent-skills",
@@ -17,18 +17,18 @@
     "quality-gates",
     "skills-sh"
   ],
-  "homepage": "https://github.com/YuluoY/ironweave",
+  "homepage": "https://github.com/YuluoY/nimis",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YuluoY/ironweave.git"
+    "url": "https://github.com/YuluoY/nimis.git"
   },
   "bugs": {
-    "url": "https://github.com/YuluoY/ironweave/issues"
+    "url": "https://github.com/YuluoY/nimis/issues"
   },
   "license": "MIT",
   "author": "YuluoY",
   "bin": {
-    "ironweave": "./bin/cli.js"
+    "nimis": "./bin/cli.js"
   },
   "files": [
     "skills/",

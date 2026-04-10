@@ -43,6 +43,7 @@ graph TD
 - **DO NOT** place documents directly under `docs/` root (e.g., `docs/login.md`). Must be in business module subdirectories (e.g., `docs/auth/login.md`).
 - **DO NOT** skip this skill. If a task produces documentation, it must be organized through this skill.
 - **DO NOT** omit progress records. Every completed task must write to `docs/progress/{date}/{username}_{hash}.md`.
+- **DO NOT** manually generate timestamps. All times (dates, HH:mm:ss) must be produced by the `docs_manager.py` script. LLMs must never calculate or concatenate time strings themselves (common error: manually adding timezone offset to UTC time produces invalid hours like 25:xx).
 
 ## Directory Structure
 
@@ -79,6 +80,7 @@ docs/
 - Session hash: 6-digit random hexadecimal (e.g., `a3f8c1`), ensures uniqueness
 - **Same-session append**: Within the same Agent session window, all progress records are appended to the same file — no new files created. A new session hash is generated only when switching to a new session window.
 - Multiple session files per day allowed (different people/different tasks)
+- **Must use script**: Progress record creation and appending must be done via `python scripts/docs_manager.py progress` command. LLMs must not directly generate/write progress Markdown files. The script guarantees timestamps use system local time (`datetime.now()`), avoiding timezone calculation errors.
 
 > Complete naming rules in → `references/naming-rules.md`
 

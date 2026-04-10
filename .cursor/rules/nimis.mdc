@@ -1,10 +1,9 @@
 ---
-description: Ironweave skills framework — orchestration, requirements, architecture, TDD, and quality gates
+description: Nimis skills framework — orchestration, requirements, architecture, TDD, and quality gates
 alwaysApply: true
-enabled: true
 ---
 
-# Ironweave
+# Nimis
 
 ⛔ **MANDATORY**: For ALL development tasks, you MUST first read `skills/orchestrator/SKILL.md` and follow its execution protocol. Do not skip this step.
 

@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">Ironweave</h1>
+  <h1 align="center">Nimis</h1>
   <p align="center">
     面向 AI 编程 Agent 的技能框架与软件开发方法论。
   </p>
@@ -10,7 +10,7 @@
 
 ---
 
-Ironweave 是一套完整的软件开发工作流，由一组可自由组合的 **技能（Skills）** 构建而成。它不只是写代码 — 它会先理解你要构建什么，制定计划，将工作拆分为切片，然后通过内置质量卡点逐一执行每个切片。而且这些技能会自动触发，你不需要做任何特殊操作。你的 Agent 拥有 Ironweave 就够了。
+Nimis 是一套完整的软件开发工作流，由一组可自由组合的 **技能（Skills）** 构建而成。它不只是写代码 — 它会先理解你要构建什么，制定计划，将工作拆分为切片，然后通过内置质量卡点逐一执行每个切片。而且这些技能会自动触发，你不需要做任何特殊操作。你的 Agent 拥有 Nimis 就够了。
 
 ## 工作原理
 
@@ -100,29 +100,29 @@ Ironweave 是一套完整的软件开发工作流，由一组可自由组合的 
 
 ```bash
 # 安装全部技能 + 全部编辑器配置（中文，默认）
-npx ironweave@latest init
+npx nimis@latest init
 
 # 安装英文版技能
-npx ironweave@latest init --lang en
+npx nimis@latest init --lang en
 
 # 只安装特定编辑器的配置
-npx ironweave@latest init --agent cursor
-npx ironweave@latest init --agent trae
-npx ironweave@latest init --agent windsurf
+npx nimis@latest init --agent cursor
+npx nimis@latest init --agent trae
+npx nimis@latest init --agent windsurf
 
 # 只复制 skills/，不安装编辑器配置
-npx ironweave@latest init --skills-only
+npx nimis@latest init --skills-only
 
 # 覆盖已有文件
-npx ironweave@latest init --force
+npx nimis@latest init --force
 
 # 列出所有可用技能
-npx ironweave@latest list
+npx nimis@latest list
 ```
 
 可选编辑器：`claude`、`copilot`、`cursor`、`windsurf`、`cline`、`trae`、`codebuddy`、`codex`、`gemini`、`all`（默认全部）。
 
-> **冲突处理**：默认不覆盖已有文件。Ironweave 会将配置与你现有的规则并存。使用 `--force` 强制覆盖。
+> **冲突处理**：默认不覆盖已有文件。Nimis 会将配置与你现有的规则并存。使用 `--force` 强制覆盖。
 
 > **Skills 位置**：指定单个目录型编辑器时（如 `--agent trae`），skills 会安装到该编辑器目录内（如 `.trae/skills/`）。使用 `--agent all`（默认）时，skills 安装在项目根目录 `skills/`。
 
@@ -130,36 +130,36 @@ npx ironweave@latest list
 
 ```bash
 # 安装到指定编辑器（推荐）
-npx skills add YuluoY/ironweave --skill '*' -a cursor -y
-npx skills add YuluoY/ironweave --skill '*' -a trae -y
-npx skills add YuluoY/ironweave --skill '*' -a claude-code -y
+npx skills add YuluoY/nimis --skill '*' -a cursor -y
+npx skills add YuluoY/nimis --skill '*' -a trae -y
+npx skills add YuluoY/nimis --skill '*' -a claude-code -y
 
 # 安装到多个编辑器
-npx skills add YuluoY/ironweave --skill '*' -a cursor -a windsurf -y
+npx skills add YuluoY/nimis --skill '*' -a cursor -a windsurf -y
 
 # 安装到所有编辑器（会生成很多 agent 目录）
-npx skills add YuluoY/ironweave --all
+npx skills add YuluoY/nimis --all
 
 # 交互式选择技能和编辑器
-npx skills add YuluoY/ironweave
+npx skills add YuluoY/nimis
 
 # 列出可用技能
-npx skills add YuluoY/ironweave --list
+npx skills add YuluoY/nimis --list
 ```
 
 skills.sh 的 Agent 名称：`claude-code`、`github-copilot`、`cursor`、`windsurf`、`cline`、`trae`、`codebuddy`、`codex`、`gemini-cli`。
 
-> 注意：`skills.sh` 不支持 `--lang` 参数。如需英文版，请使用 `npx ironweave@latest init --lang en`。
+> 注意：`skills.sh` 不支持 `--lang` 参数。如需英文版，请使用 `npx nimis@latest init --lang en`。
 
 ### 各 Agent 手动安装
 
 <details>
 <summary><b>Claude Code</b></summary>
 
-Ironweave 自带项目根目录的 `CLAUDE.md` — Claude Code 会自动读取。
+Nimis 自带项目根目录的 `CLAUDE.md` — Claude Code 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -167,10 +167,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>VS Code GitHub Copilot</b></summary>
 
-Ironweave 已预配置 `.github/copilot-instructions.md`。
+Nimis 已预配置 `.github/copilot-instructions.md`。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -178,10 +178,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Cursor</b></summary>
 
-Ironweave 自带 `.cursor/rules/ironweave.mdc`（`alwaysApply: true`），可自动发现。
+Nimis 自带 `.cursor/rules/nimis.mdc`（`alwaysApply: true`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -189,10 +189,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Windsurf</b></summary>
 
-Ironweave 自带 `.windsurf/rules/ironweave.md`（`trigger: always_on`），可自动发现。
+Nimis 自带 `.windsurf/rules/nimis.md`（`trigger: always_on`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -200,10 +200,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Cline</b></summary>
 
-Ironweave 自带 `.clinerules/ironweave.md`，可自动发现。
+Nimis 自带 `.clinerules/nimis.md`，可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -211,10 +211,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Trae</b></summary>
 
-Ironweave 自带 `.trae/rules/ironweave.md`，可自动发现。
+Nimis 自带 `.trae/rules/nimis.md`，可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -222,10 +222,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>CodeBuddy（腾讯云）</b></summary>
 
-Ironweave 自带 `.codebuddy/rules/ironweave/RULE.mdc`（`alwaysApply: true`），可自动发现。
+Nimis 自带 `.codebuddy/rules/nimis/RULE.mdc`（`alwaysApply: true`），可自动发现。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -233,10 +233,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Codex (OpenAI)</b></summary>
 
-Ironweave 自带项目根目录的 `AGENTS.md` — Codex 会自动读取。
+Nimis 自带项目根目录的 `AGENTS.md` — Codex 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -244,10 +244,10 @@ git clone https://github.com/YuluoY/ironweave.git
 <details>
 <summary><b>Gemini CLI</b></summary>
 
-Ironweave 自带项目根目录的 `GEMINI.md` — Gemini CLI 会自动读取。
+Nimis 自带项目根目录的 `GEMINI.md` — Gemini CLI 会自动读取。
 
 ```bash
-git clone https://github.com/YuluoY/ironweave.git
+git clone https://github.com/YuluoY/nimis.git
 ```
 
 </details>
@@ -255,7 +255,7 @@ git clone https://github.com/YuluoY/ironweave.git
 ## 项目结构
 
 ```
-ironweave/
+nimis/
 ├── skills/                            # 技能（中文）
 │   ├── orchestrator/                # 流程编排器
 │   │   ├── SKILL.md                # 编排器逻辑
@@ -270,11 +270,11 @@ ironweave/
 ├── AGENTS.md                        # Codex / 跨 Agent 兼容
 ├── GEMINI.md                        # Gemini CLI
 ├── .github/copilot-instructions.md    # VS Code Copilot
-├── .cursor/rules/ironweave.mdc        # Cursor
-├── .windsurf/rules/ironweave.md       # Windsurf
-├── .clinerules/ironweave.md           # Cline
-├── .trae/rules/ironweave.md           # Trae
-├── .codebuddy/rules/ironweave/RULE.mdc  # CodeBuddy
+├── .cursor/rules/nimis.mdc        # Cursor
+├── .windsurf/rules/nimis.md       # Windsurf
+├── .clinerules/nimis.md           # Cline
+├── .trae/rules/nimis.md           # Trae
+├── .codebuddy/rules/nimis/RULE.mdc  # CodeBuddy
 ├── README.md
 ├── README_CN.md
 ├── CONTRIBUTING.md
@@ -290,7 +290,7 @@ ironweave/
 
 **全链路可追溯** — 每个技术决策都记录*为什么选它*和*对比过哪些备选*。进度通过 `docs/` 持续追踪，跨会话上下文通过 SQLite 持久化。没有任何环节依赖记忆。
 
-**对抗 AI 认知弱点** — AI 代理天然低估复杂度、跳过验证、跨会话遗忘上下文、遗忘计划。Ironweave 的机制直接针对这些弱点：路径锁定防跳步，难度节流阀防低估，文件持久化防遗忘，机械对账防遗漏。
+**对抗 AI 认知弱点** — AI 代理天然低估复杂度、跳过验证、跨会话遗忘上下文、遗忘计划。Nimis 的机制直接针对这些弱点：路径锁定防跳步，难度节流阀防低估，文件持久化防遗忘，机械对账防遗漏。
 
 **人定策略，机器执行** — 系统提供默认值和推荐方案，但人类拥有无条件覆盖权。技术选型是推荐而非强制，难度评分可随时用自然语言覆盖。AI 执行工作流，人类掌握决策权。
 
@@ -311,4 +311,4 @@ ironweave/
 
 ## 许可证
 
-[MIT](./LICENSE) © Ironweave Contributors
+[MIT](./LICENSE) © Nimis Contributors
