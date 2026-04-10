@@ -174,6 +174,8 @@ For large projects (> 500 files), vectorization can be enabled for semantic sear
 
 ## Python Scripts
 
+### context_db.py — Context Database Management
+
 ```bash
 python scripts/context_db.py init        --root <project_root>
 python scripts/context_db.py sync        --root <project_root>
@@ -185,6 +187,26 @@ python scripts/context_db.py validate    --root <project_root>
 ```
 
 > Script implementations → `scripts/context_db.py`, `scripts/dep_extractor.py`
+
+### phase_guard.py — Phase Chain Guard
+
+Provides mechanical checkpoints at Plan→Execute→Validate→Deliver phase transitions. Records enter/gate events to the `phase_log` table, ensuring phase chain integrity is verifiable after the fact.
+
+```bash
+# Enter phase (verifies prior phase has gate-passed)
+python scripts/phase_guard.py enter     --root <project_root> --slice <SN> --phase <plan|execute|validate|deliver>
+
+# Record gate result
+python scripts/phase_guard.py gate      --root <project_root> --slice <SN> --phase <phase> --result <pass|fail> [--outputs '<JSON>']
+
+# Reconcile complete chain (call after Deliver)
+python scripts/phase_guard.py reconcile --root <project_root> --slice <SN>
+
+# Query current status
+python scripts/phase_guard.py status    --root <project_root> [--slice <SN>]
+```
+
+> Script implementation → `scripts/phase_guard.py`
 
 ## Common Issues
 

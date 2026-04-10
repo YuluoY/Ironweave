@@ -178,3 +178,21 @@ In multi-Slice mode, each Slice's Deliver also writes Slice progress to docs/pro
 ```
 
 On next session resume, read this table to locate the continuation point.
+
+---
+
+## ⛔ Phase Chain Guard Integration
+
+After Deliver completes all sync and reconciliation, you **must** execute the following closure:
+
+```bash
+# 1. Record Deliver phase gate pass
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase deliver --result pass
+
+# 2. Reconcile complete phase chain (plan→execute→validate→deliver, 4 gate-passes)
+python3 skills/project-context/scripts/phase_guard.py reconcile \
+  --root . --slice <SN>
+```
+
+reconcile verifies whether the Slice has traversed the complete `plan.enter → plan.gate-pass → execute.enter → execute.gate-pass → validate.enter → validate.gate-pass → deliver.enter → deliver.gate-pass` chain. If any link is missing, it outputs `INCOMPLETE` with the missing items.

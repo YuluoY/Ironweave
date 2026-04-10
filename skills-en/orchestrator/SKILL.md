@@ -25,6 +25,22 @@ Receive user input → **Input Classification** → Adaptive context sensing →
 7. **Per-slice execution** → Plan → Execute → Validate → Deliver, with quality gates at each transition
 8. **docs-output** → Mandatory sync at end of Plan and during Deliver for every slice (infrastructure skill, must not skip)
 
+**Phase Chain Guard**: At every phase transition, you **must** call `phase_guard.py` to record a checkpoint. This is the only mechanically verifiable execution chain evidence.
+
+```bash
+# Enter phase (verifies prior phase gate-passed)
+python3 skills/project-context/scripts/phase_guard.py enter --root . --slice S1 --phase plan
+
+# Record gate result
+python3 skills/project-context/scripts/phase_guard.py gate --root . --slice S1 --phase plan --result pass --outputs '[{"path":"docs/plan.md"}]'
+
+# Reconcile after Deliver (verify complete chain)
+python3 skills/project-context/scripts/phase_guard.py reconcile --root . --slice S1
+
+# Query current status
+python3 skills/project-context/scripts/phase_guard.py status --root . --slice S1
+```
+
 **Violation check**: If you understood the requirements but skipped steps 1-3 and jumped directly to writing code, this is a violation. Stop immediately and restart from step 1.
 
 ---
@@ -330,13 +346,19 @@ The Plan phase's sequential skill chain accumulates substantial intermediate out
 
 ### Plan
 
+⛔ Before entering Plan, execute `phase_guard.py enter --slice <SN> --phase plan`.
+
 Read the matched route-{x}.md and execute Plan following its skill orchestration.
 
 ### Plan Gate / Validate Gate
 
 Upon reaching a gate → read `references/gates.md`
 
+⛔ After gate pass/fail, execute `phase_guard.py gate --slice <SN> --phase <plan|validate> --result <pass|fail>`.
+
 ### Execute
+
+⛔ Before entering Execute, execute `phase_guard.py enter --slice <SN> --phase execute`.
 
 After Plan gate passes → read `references/execute.md` and follow its rules for coding.
 
@@ -366,6 +388,8 @@ graph LR
 
 ### Deliver
 
+⛔ Before entering Deliver, execute `phase_guard.py enter --slice <SN> --phase deliver`.
+
 After Validate passes → read `references/deliver.md`
 
 **Every slice's Deliver performs full sync** (not just the final slice), ensuring intermediate outputs are persisted and recoverable across sessions.
@@ -374,6 +398,8 @@ Deliver includes three mandatory steps:
 1. **SubAgent parallel**: docs-output + project-context sync
 2. **Reconcile**: Mechanically compare Plan/Execute output checklist vs actual on-disk state, immediately write anything missing
 3. **Delivery summary**: Output this Slice's or final delivery summary
+
+⛔ After Deliver completes, execute `phase_guard.py gate --slice <SN> --phase deliver --result pass` + `phase_guard.py reconcile --slice <SN>`.
 
 ### Parallel Strategy (on demand)
 

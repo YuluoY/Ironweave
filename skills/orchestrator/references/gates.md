@@ -250,3 +250,40 @@ graph TB
 **建议动作**: 回到需求步骤，补充"本次不做"清单
 **回流目标**: Plan → 需求 QA
 ```
+
+---
+
+## ⛔ Phase Chain Guard 集成
+
+卡点检查输出后，**必须**调用 `phase_guard.py gate` 记录结果。这是机械化证据链，不可跳过。
+
+### Plan 卡点通过后
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase plan --result pass \
+  --outputs '[{"path":"docs/plan.md"},{"path":"docs/spec.md"}]'
+```
+
+### Plan 卡点失败后
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase plan --result fail
+```
+
+### Validate 卡点通过后
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase validate --result pass
+```
+
+### Validate 卡点失败后（触发回流）
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase validate --result fail
+```
+
+回流修复完成后，重新进入对应阶段时 `phase_guard.py enter` 会正常放行（因为它检查的是**前置**阶段的 gate-pass，不是当前阶段）。

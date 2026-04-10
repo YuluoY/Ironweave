@@ -186,6 +186,45 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_kf_name ON knowledge_flows(flow_name);
 ]
 ```
 
+## phase_log — 阶段链守卫日志
+
+记录 Plan→Execute→Validate→Deliver 四阶段的 enter/gate 事件，提供机械化检查点。由 `scripts/phase_guard.py` 管理。
+
+```sql
+CREATE TABLE IF NOT EXISTS phase_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    slice_id     TEXT NOT NULL,         -- Slice 标识（如 "S1", "S2"）
+    phase        TEXT NOT NULL,         -- plan / execute / validate / deliver
+    event        TEXT NOT NULL,         -- enter / gate-pass / gate-fail
+    outputs      TEXT,                  -- JSON 数组：[{"path":"...","exists":true,"hash":"..."}]
+    gate_detail  TEXT,                  -- JSON：Gate 检查详情（如各检查项通过/失败）
+    session_hash TEXT,                  -- 产生此记录的会话标识
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_pl_slice ON phase_log(slice_id);
+CREATE INDEX IF NOT EXISTS idx_pl_lookup ON phase_log(slice_id, phase, event);
+```
+
+### event 取值规则
+
+| event | 含义 | 写入时机 |
+|-------|------|---------|
+| `enter` | 进入该阶段 | phase_guard.py enter —— 验证前置 phase 的 gate-pass 后写入 |
+| `gate-pass` | 阶段卡点通过 | phase_guard.py gate --result pass —— 验证产出文件存在后写入 |
+| `gate-fail` | 阶段卡点未通过 | phase_guard.py gate --result fail —— 触发回流 |
+
+### 阶段依赖链
+
+```
+plan.enter → plan.gate-pass → execute.enter → execute.gate-pass → validate.enter → validate.gate-pass → deliver.enter → deliver.gate-pass
+```
+
+- `execute.enter` 要求 `plan.gate-pass` 已存在
+- `validate.enter` 要求 `execute.gate-pass` 已存在
+- `deliver.enter` 要求 `validate.gate-pass` 已存在
+- `plan.enter` 无前置条件（首阶段）
+
 ## FTS5 全文检索（可选启用）
 
 ```sql

@@ -178,3 +178,21 @@ SubAgent 并行同步完成后、输出交付摘要之前，执行一次**机械
 ```
 
 下次会话恢复时读取此表即可定位续做位置。
+
+---
+
+## ⛔ Phase Chain Guard 集成
+
+Deliver 阶段完成所有同步和对账后，**必须**执行以下收尾：
+
+```bash
+# 1. 记录 Deliver 阶段卡点通过
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase deliver --result pass
+
+# 2. 对账完整阶段链（plan→execute→validate→deliver 4 个 gate-pass）
+python3 skills/project-context/scripts/phase_guard.py reconcile \
+  --root . --slice <SN>
+```
+
+reconcile 会验证该 Slice 是否走过完整的 `plan.enter → plan.gate-pass → execute.enter → execute.gate-pass → validate.enter → validate.gate-pass → deliver.enter → deliver.gate-pass` 链条。如果缺少任何环节，会输出 `INCOMPLETE` 并列出缺失项。

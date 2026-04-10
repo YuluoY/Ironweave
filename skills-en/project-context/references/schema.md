@@ -186,6 +186,45 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_kf_name ON knowledge_flows(flow_name);
 ]
 ```
 
+## phase_log — Phase Chain Guard Log
+
+Records enter/gate events across the Plan→Execute→Validate→Deliver four-phase lifecycle, providing mechanical checkpoints. Managed by `scripts/phase_guard.py`.
+
+```sql
+CREATE TABLE IF NOT EXISTS phase_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    slice_id     TEXT NOT NULL,         -- Slice identifier (e.g. "S1", "S2")
+    phase        TEXT NOT NULL,         -- plan / execute / validate / deliver
+    event        TEXT NOT NULL,         -- enter / gate-pass / gate-fail
+    outputs      TEXT,                  -- JSON array: [{"path":"...","exists":true,"hash":"..."}]
+    gate_detail  TEXT,                  -- JSON: Gate check details (per-item pass/fail)
+    session_hash TEXT,                  -- Session identifier that produced this record
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_pl_slice ON phase_log(slice_id);
+CREATE INDEX IF NOT EXISTS idx_pl_lookup ON phase_log(slice_id, phase, event);
+```
+
+### event Values
+
+| event | Meaning | When Written |
+|-------|---------|-------------|
+| `enter` | Entered this phase | phase_guard.py enter — written after verifying prior phase's gate-pass |
+| `gate-pass` | Phase gate passed | phase_guard.py gate --result pass — written after verifying output files exist |
+| `gate-fail` | Phase gate failed | phase_guard.py gate --result fail — triggers reflow |
+
+### Phase Dependency Chain
+
+```
+plan.enter → plan.gate-pass → execute.enter → execute.gate-pass → validate.enter → validate.gate-pass → deliver.enter → deliver.gate-pass
+```
+
+- `execute.enter` requires `plan.gate-pass` to exist
+- `validate.enter` requires `execute.gate-pass` to exist
+- `deliver.enter` requires `validate.gate-pass` to exist
+- `plan.enter` has no prerequisite (first phase)
+
 ## FTS5 Full-Text Search (Optional)
 
 ```sql

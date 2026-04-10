@@ -174,6 +174,8 @@ graph TB
 
 ## Python 脚本
 
+### context_db.py — 上下文数据库管理
+
 ```bash
 python scripts/context_db.py init        --root <project_root>
 python scripts/context_db.py sync        --root <project_root>
@@ -185,6 +187,26 @@ python scripts/context_db.py validate    --root <project_root>
 ```
 
 > 脚本实现见 → `scripts/context_db.py`、`scripts/dep_extractor.py`
+
+### phase_guard.py — 阶段链守卫
+
+在 Plan→Execute→Validate→Deliver 四阶段转换处提供机械化检查点。记录进入/卡点事件到 `phase_log` 表，确保阶段链完整性可事后验证。
+
+```bash
+# 进入阶段（验证前置阶段已 gate-pass）
+python scripts/phase_guard.py enter     --root <project_root> --slice <SN> --phase <plan|execute|validate|deliver>
+
+# 记录卡点结果
+python scripts/phase_guard.py gate      --root <project_root> --slice <SN> --phase <phase> --result <pass|fail> [--outputs '<JSON>']
+
+# 对账完整链（Deliver 结束后调用）
+python scripts/phase_guard.py reconcile --root <project_root> --slice <SN>
+
+# 查询当前状态
+python scripts/phase_guard.py status    --root <project_root> [--slice <SN>]
+```
+
+> 脚本实现见 → `scripts/phase_guard.py`
 
 ## 常见问题
 

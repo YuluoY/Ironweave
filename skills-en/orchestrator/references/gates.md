@@ -250,3 +250,40 @@ Output after each gate check:
 **Recommended Action**: Return to requirement step, add "out of scope" list
 **Reflux Target**: Plan -> Requirement QA
 ```
+
+---
+
+## ⛔ Phase Chain Guard Integration
+
+After outputting the gate check result, you **must** call `phase_guard.py gate` to record it. This is the mechanical evidence chain and must not be skipped.
+
+### After Plan Gate Pass
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase plan --result pass \
+  --outputs '[{"path":"docs/plan.md"},{"path":"docs/spec.md"}]'
+```
+
+### After Plan Gate Fail
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase plan --result fail
+```
+
+### After Validate Gate Pass
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase validate --result pass
+```
+
+### After Validate Gate Fail (triggers reflux)
+
+```bash
+python3 skills/project-context/scripts/phase_guard.py gate \
+  --root . --slice <SN> --phase validate --result fail
+```
+
+After reflux repair, re-entering the corresponding phase via `phase_guard.py enter` will proceed normally (it checks the **prior** phase's gate-pass, not the current phase).

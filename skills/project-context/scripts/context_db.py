@@ -171,6 +171,19 @@ CREATE TABLE IF NOT EXISTS knowledge_flows (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_kf_name ON knowledge_flows(flow_name);
 
+CREATE TABLE IF NOT EXISTS phase_log (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    slice_id     TEXT NOT NULL,
+    phase        TEXT NOT NULL,
+    event        TEXT NOT NULL,
+    outputs      TEXT,
+    gate_detail  TEXT,
+    session_hash TEXT,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_pl_slice ON phase_log(slice_id);
+CREATE INDEX IF NOT EXISTS idx_pl_lookup ON phase_log(slice_id, phase, event);
+
 """
 
 
